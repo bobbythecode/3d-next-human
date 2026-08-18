@@ -30,4 +30,4 @@ scripts\human\generate.cmd --out %TEMP%\human.obj
 
 แล้วใน editor: หุ่นชนผ้า → อัปโหลด OBJ · ผ้าชนเมื่อกดจำลอง
 
-UI สไลเดอร์ Macro ใน portal = **P5.7b ผ่าน** 2026-08-18 — แผน: [`../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md`](../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md) · Head–Feet = P5.7c
+UI สไลเดอร์ Macro + Head–Feet ใน portal = **P5.7b + P5.7c ผ่าน** 2026-08-18 — แผน: [`../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md`](../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md) · ถัดไป Pose = P5.7d

@@ -42,3 +42,6 @@ def test_catalog_lists_macro_and_body_categories():
         assert required in slider_ids
     ethnic = next(s for s in macro["groups"][0]["sliders"] if s["id"] == "macrodetails/African")
     assert ethnic["constraint"] == "ethnic-sum-1"
+    ids = {item["id"] for item in payload["categories"]}
+    assert "body-shapes" in ids
+    assert "measure" in ids

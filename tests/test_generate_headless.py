@@ -49,7 +49,21 @@ def test_generate_rejects_unknown_modifier():
 
 
 @pytest.mark.integration
-def test_generate_rejects_unknown_modifier():
-    with pytest.raises(Exception, match="unknown modifier"):
-        generate({"modifiers": {"not-a-real-slider": 0.5}})
+def test_generate_applies_head_and_torso_modifiers():
+    baseline = generate({"gender": 0.5, "age": 0.5, "weight": 0.5, "muscle": 0.5, "height": 0.5})
+    shaped = generate(
+        {
+            "gender": 0.5,
+            "age": 0.5,
+            "weight": 0.5,
+            "muscle": 0.5,
+            "height": 0.5,
+            "modifiers": {
+                "eyes/r-eye-scale-decr|incr": 0.8,
+                "torso/torso-scale-horiz-decr|incr": 0.7,
+            },
+        }
+    )
+    assert shaped["obj"] != baseline["obj"]
+    assert qt_imported() is False
 
