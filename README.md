@@ -1,7 +1,36 @@
 # MakeHuman
 
-This is the main source code for the MakeHuman application as such. See "Getting started" below for instructions on how to get MakeHuman up and running. Mac users
-_should_ be able to use the same instructions as windows users, although this has not been thoroughly tested.
+ซอร์สหลักของแอป MakeHuman (เอกสารต้นทางด้านล่างเป็นภาษาอังกฤษ)
+
+## 3d-next (P5.7)
+
+รันแบบ **HTTP ไม่มีหน้าต่าง** แทนแอปเดสก์ท็อป — แผน: [`documents/plans/human-api.md`](documents/plans/human-api.md)
+
+Python ใน repo นี้เป็น **AGPL** · พี่น้อง `3d-next-service` เรียกได้แค่ REST ห้าม import
+
+**G-P5.7 ผ่าน** — generate OBJ หน่วยเมตร แกน Y ขึ้น · เท้าที่ Y=0 · อัปโหลดทาบ 2D/3D · ส่ง macros แล้วหุ่นเปลี่ยน (ยืนยันตา 2026-08-18)
+
+สภาพแวดล้อม: conda env `human` · Python 3.9 · numpy 1.x (อย่าใช้ Python 3.13 ของเครื่อง)
+
+```text
+conda activate human
+python -m service.http_api
+```
+
+วินโดวส์ (รายวัน):
+
+```bat
+scripts\dev-up.cmd
+```
+
+จากนั้นที่ `3d-next-service`: `scripts\human\generate.cmd --out %TEMP%\human.obj --height-cm 160 --gender 1`  
+ใน editor: หุ่นชนผ้า → อัปโหลด OBJ (ผ้าชนเมื่อกดจำลอง)
+
+คำตอบ JSON มี `applied` (ค่าที่ใส่ใน modifier) และ `height_cm` ที่วัดจากเมช
+
+Git Bash: `HUMAN_PYTHON=.../envs/human/python.exe ./scripts/dev-up.sh`  
+`GET /health` · `POST /internal/humans/generate` ที่ `http://127.0.0.1:8001`  
+เกตนี้ห้ามติด PyQt5 · ห้ามให้ Nest import แพ็กเกจนี้
 
 ## Current status
 

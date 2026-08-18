@@ -1,0 +1,20 @@
+---
+description: Keep MakeHuman AGPL in this repo; HTTP only to siblings
+alwaysApply: true
+---
+
+# agpl-isolation (human)
+
+ซอร์สใน repo นี้เป็น **AGPL-3.0** (MakeHuman)
+
+```text
+✅ HTTP facade สำหรับ generate หุ่น อยู่ที่นี่
+✅ ผล OBJ = ข้อมูลผู้ใช้ (LICENSE.md หมวด D)
+✅ Dev รันบนโฮสต์ให้เร็ว — ไม่บังคับ Docker เป็นเกต
+
+❌ อย่าย้าย makehuman ไป 3d-next-service / 3d-next-tailor / 3d-next-portal
+❌ อย่าแนะนำให้ Nest pip-install หรือ COPY ซอร์สนี้
+❌ อย่าผูกเกตกับหน้าต่าง desktop
+```
+
+แผน: sibling `3d-next-portal/documents/plans/p5_7-human-api.md`
