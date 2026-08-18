@@ -66,3 +66,18 @@ def test_ethnicity_values_sum_to_one():
     ).modifier_values()
     ethnic = [values["macrodetails/African"], values["macrodetails/Asian"], values["macrodetails/Caucasian"]]
     assert sum(ethnic) == pytest.approx(1.0)
+
+
+def test_accepts_pose_and_pose_units():
+    req = HumanModifierRequest.parse(
+        {"pose": {"id": "tpose"}, "pose_units": {"UpperArmUpLeft1": 0.3}}
+    )
+    assert req.pose_id == "tpose"
+    assert req.pose_units["UpperArmUpLeft1"] == 0.3
+
+
+def test_rejects_unknown_pose_and_pose_unit():
+    with pytest.raises(ModifierRequestError, match="unknown pose id"):
+        HumanModifierRequest.parse({"pose": {"id": "no-such-pose"}})
+    with pytest.raises(ModifierRequestError, match="unknown pose unit"):
+        HumanModifierRequest.parse({"pose_units": {"NoSuchUnit": 0.5}})

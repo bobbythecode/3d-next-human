@@ -67,3 +67,12 @@ def test_generate_applies_head_and_torso_modifiers():
     assert shaped["obj"] != baseline["obj"]
     assert qt_imported() is False
 
+
+@pytest.mark.integration
+def test_generate_applies_tpose_differently_from_rest():
+    rest = generate({"pose": {"id": "rest"}})
+    tpose = generate({"pose": {"id": "tpose"}})
+    assert rest["pose"]["id"] == "rest"
+    assert tpose["pose"]["id"] == "tpose"
+    assert tpose["obj"] != rest["obj"]
+

@@ -6,10 +6,15 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping, Optional
 
 from .catalog import ALIAS_TO_FULLNAME, ETHNIC_IDS, MACRO_IDS, allowed_modifier_ids
+from .pose_catalog import REST_POSE_ID, allowed_pose_ids, pose_units_map
 
 MACRO_KEYS = ("gender", "age", "weight", "muscle")
 HEIGHT_KEYS = ("height", "height_cm")
-TOP_LEVEL = frozenset(MACRO_KEYS + HEIGHT_KEYS + ("proportions", "african", "asian", "caucasian", "modifiers"))
+TOP_LEVEL = frozenset(
+    MACRO_KEYS
+    + HEIGHT_KEYS
+    + ("proportions", "african", "asian", "caucasian", "modifiers", "pose", "pose_units")
+)
 
 
 class ModifierRequestError(ValueError):
@@ -62,6 +67,8 @@ class HumanModifierRequest:
     asian: float = 1.0 / 3.0
     caucasian: float = 1.0 / 3.0
     extra: dict[str, float] = field(default_factory=dict)
+    pose_id: str = REST_POSE_ID
+    pose_units: dict[str, float] = field(default_factory=dict)
 
     @classmethod
     def parse(cls, payload: object) -> "HumanModifierRequest":
@@ -107,10 +114,14 @@ class HumanModifierRequest:
         extras_alias = {
             key: _as_unit(payload[key], key) for key in optional_aliases if key in payload
         }
+        pose_id = _parse_pose(payload.get("pose"))
+        pose_units = _parse_pose_units(payload.get("pose_units"))
         return cls(
             height=height,
             height_cm=height_cm,
             extra=extra,
+            pose_id=pose_id,
+            pose_units=pose_units,
             **values,
             **extras_alias,
         )
@@ -131,6 +142,10 @@ class HumanModifierRequest:
         else:
             payload["height"] = float(self.height if self.height is not None else 0.5)
         payload.update(self.extra)
+        if self.pose_id != REST_POSE_ID:
+            payload["pose"] = {"id": self.pose_id}
+        if self.pose_units:
+            payload["pose_units"] = dict(self.pose_units)
         return payload
 
     def modifier_values(self) -> dict[str, float]:
@@ -162,3 +177,32 @@ def _normalize_ethnic(values: dict[str, float]) -> None:
         return
     for slider_id in ETHNIC_IDS:
         values[slider_id] = values.get(slider_id, 0.0) / total
+
+
+def _parse_pose(raw_pose: Any) -> str:
+    if raw_pose is None:
+        return REST_POSE_ID
+    if not isinstance(raw_pose, Mapping):
+        raise ModifierRequestError("pose must be an object like { id: \"tpose\" }")
+    raw_id = raw_pose.get("id")
+    if not isinstance(raw_id, str) or raw_id.strip() == "":
+        raise ModifierRequestError("pose.id must be a non-empty string")
+    pose_id = raw_id.strip().lower()
+    if pose_id not in allowed_pose_ids():
+        raise ModifierRequestError(f"unknown pose id: {pose_id}")
+    return pose_id
+
+
+def _parse_pose_units(raw_units: Any) -> dict[str, float]:
+    if raw_units is None:
+        return {}
+    if not isinstance(raw_units, Mapping):
+        raise ModifierRequestError("pose_units must be a JSON object")
+    allowed = pose_units_map()
+    values: dict[str, float] = {}
+    for key, value in raw_units.items():
+        unit_id = str(key)
+        if unit_id not in allowed:
+            raise ModifierRequestError(f"unknown pose unit: {unit_id}")
+        values[unit_id] = _as_unit(value, unit_id)
+    return values

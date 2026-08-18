@@ -8,6 +8,7 @@ from .bootstrap import ensure_runtime, qt_imported
 from .catalog import ALIAS_TO_FULLNAME
 from .mesh_export import export_basemesh
 from .modifier_request import HumanModifierRequest
+from .pose_catalog import apply_pose
 
 _HUMAN = None
 
@@ -30,12 +31,16 @@ def _load_human():
     import files3d
     import human
     import humanmodifier
+    import skeleton
+    from core import G
     from getpath import getSysDataPath
 
     mesh = files3d.loadMesh(getSysDataPath("3dobjs/base.obj"), maxFaces=5)
     if mesh is None:
         raise HumanSessionError("failed to load MakeHuman base.obj")
     person = human.Human(mesh)
+    G.app.selectedHuman = person
+    person.setBaseSkeleton(skeleton.load(getSysDataPath("rigs/default.mhskel"), person.meshData))
     for relative in MODIFIER_FILES:
         humanmodifier.loadModifiers(getSysDataPath(relative), person)
     _HUMAN = person
@@ -70,6 +75,7 @@ def generate(payload: object) -> dict[str, Any]:
         _set_height_cm(person, request.height_cm)
     else:
         person.applyAllTargets()
+    pose = apply_pose(person, request.pose_id, request.pose_units)
     if qt_imported():
         raise HumanSessionError("Qt was imported during generate; headless contract broken")
     mesh = person.meshData
@@ -77,6 +83,7 @@ def generate(payload: object) -> dict[str, Any]:
     return {
         "height_cm": float(person.getHeightCm()),
         "applied": request.as_dict(),
+        "pose": pose,
         "unit": "m",
         "up": "y",
         "obj": obj,
