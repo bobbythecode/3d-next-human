@@ -5,7 +5,7 @@
 
 ## Responsibility (หนึ่งอย่าง)
 
-parse JSON macros ของ MakeHuman เป็นค่าที่ใช้กับ modifier — 0..1 ตามสไลเดอร์ ยกเว้น `height_cm`
+parse JSON macros และ `modifiers` fullName ของ MakeHuman — 0..1 ตามสไลเดอร์ Macro ยกเว้น `height_cm` · สไลเดอร์อื่น -1..1
 
 ## Input
 
@@ -27,7 +27,7 @@ parse JSON macros ของ MakeHuman เป็นค่าที่ใช้ก
 ## ไม่ทำ (out of scope)
 
 - แมป YAML `body:` ของ garment-tailor
-- ผม / เสื้อผ้า / ethnic sliders รอบแรก
+- ผม / เสื้อผ้า / Pose / Skin
 - เดาสเกลจาก bbox ฝั่ง Nest
 
 ## Dependencies (inject / mock ได้)

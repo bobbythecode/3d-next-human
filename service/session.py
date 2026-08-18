@@ -5,18 +5,17 @@ from __future__ import annotations
 from typing import Any
 
 from .bootstrap import ensure_runtime, qt_imported
+from .catalog import ALIAS_TO_FULLNAME
 from .mesh_export import export_basemesh
 from .modifier_request import HumanModifierRequest
 
 _HUMAN = None
 
-MODIFIER_MAP = {
-    "gender": "macrodetails/Gender",
-    "age": "macrodetails/Age",
-    "weight": "macrodetails-universal/Weight",
-    "muscle": "macrodetails-universal/Muscle",
-    "height": "macrodetails-height/Height",
-}
+MODIFIER_FILES = (
+    "modifiers/modeling_modifiers.json",
+    "modifiers/bodyshapes_modifiers.json",
+    "modifiers/measurement_modifiers.json",
+)
 
 
 class HumanSessionError(RuntimeError):
@@ -37,16 +36,14 @@ def _load_human():
     if mesh is None:
         raise HumanSessionError("failed to load MakeHuman base.obj")
     person = human.Human(mesh)
-    humanmodifier.loadModifiers(
-        getSysDataPath("modifiers/modeling_modifiers.json"),
-        person,
-    )
+    for relative in MODIFIER_FILES:
+        humanmodifier.loadModifiers(getSysDataPath(relative), person)
     _HUMAN = person
     return person
 
 
 def _set_height_cm(person, target_cm: float) -> None:
-    modifier = person.getModifier(MODIFIER_MAP["height"])
+    modifier = person.getModifier(ALIAS_TO_FULLNAME["height"])
     lo, hi = 0.0, 1.0
     for _ in range(8):
         mid = (lo + hi) / 2.0
@@ -67,14 +64,11 @@ def generate(payload: object) -> dict[str, Any]:
     )
     person = _load_human()
     person.resetMeshValues()
-    person.getModifier(MODIFIER_MAP["gender"]).setValue(request.gender)
-    person.getModifier(MODIFIER_MAP["age"]).setValue(request.age)
-    person.getModifier(MODIFIER_MAP["weight"]).setValue(request.weight)
-    person.getModifier(MODIFIER_MAP["muscle"]).setValue(request.muscle)
+    for full_name, value in request.modifier_values().items():
+        person.getModifier(full_name).setValue(value)
     if request.height_cm is not None:
         _set_height_cm(person, request.height_cm)
     else:
-        person.getModifier(MODIFIER_MAP["height"]).setValue(request.height or 0.5)
         person.applyAllTargets()
     if qt_imported():
         raise HumanSessionError("Qt was imported during generate; headless contract broken")

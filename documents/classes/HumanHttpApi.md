@@ -13,6 +13,7 @@ HTTP facade ของกระบวนการ AGPL — health / license / gen
 |------|------|-------|
 | GET /health | — | Nest / `health.sh` |
 | GET /license | — | AGPL §13 ถ้าเปิดเน็ต |
+| GET /internal/humans/modifiers | — | Nest / portal |
 | POST /internal/humans/generate | `HumanModifierRequest` | Nest / `generate.sh` |
 
 ## Output
@@ -20,7 +21,8 @@ HTTP facade ของกระบวนการ AGPL — health / license / gen
 | ชื่อ | ชนิด | ผู้ใช้ต่อ |
 |------|------|-----------|
 | health | `{ ok, service: "human-api" }` | เกต |
-| generate | `{ height_cm, applied, unit: "m", up: "y", obj }` · `applied` = macros ที่ใช้ | upload P5.5 |
+| modifiers | `{ categories }` ตามหมวดเป้า | แผง Macro P5.7b |
+| generate | `{ height_cm, applied, unit, up, obj }` | upload P5.5 |
 
 พอร์ต dev: `127.0.0.1:8001`
 

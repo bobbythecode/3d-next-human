@@ -38,3 +38,18 @@ def test_generate_applies_height_cm_and_gender():
     assert abs(tall["height_cm"] - 180.0) < 8.0
     assert tall["height_cm"] > short["height_cm"] + 15.0
     assert qt_imported() is False
+
+
+@pytest.mark.integration
+def test_generate_rejects_unknown_modifier():
+    from service.modifier_request import ModifierRequestError
+
+    with pytest.raises(ModifierRequestError, match="unknown modifier"):
+        generate({"modifiers": {"not-a-real-slider": 0.5}})
+
+
+@pytest.mark.integration
+def test_generate_rejects_unknown_modifier():
+    with pytest.raises(Exception, match="unknown modifier"):
+        generate({"modifiers": {"not-a-real-slider": 0.5}})
+

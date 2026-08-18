@@ -47,6 +47,11 @@ class HumanHttpApi(BaseHTTPRequestHandler):
         if path == "/license":
             self._send_json(200, LICENSE_BODY)
             return
+        if path == "/internal/humans/modifiers":
+            from .catalog import catalog_payload
+
+            self._send_json(200, catalog_payload())
+            return
         self._send_json(404, {"ok": False, "error": "not found"})
 
     def do_POST(self) -> None:  # noqa: N802

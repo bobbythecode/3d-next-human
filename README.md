@@ -10,6 +10,8 @@ Python ใน repo นี้เป็น **AGPL** · พี่น้อง `3d-n
 
 **G-P5.7 ผ่าน** — generate OBJ หน่วยเมตร แกน Y ขึ้น · เท้าที่ Y=0 · อัปโหลดทาบ 2D/3D · ส่ง macros แล้วหุ่นเปลี่ยน (ยืนยันตา 2026-08-18)
 
+P5.7b: `GET /internal/humans/modifiers` · portal แผง Macro ในไดอะล็อกหุ่นชนผ้า (ผ่าน Nest)
+
 สภาพแวดล้อม: conda env `human` · Python 3.9 · numpy 1.x (อย่าใช้ Python 3.13 ของเครื่อง)
 
 ```text
