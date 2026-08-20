@@ -8,12 +8,23 @@ from typing import Any, Mapping, Optional
 from .catalog import ALIAS_TO_FULLNAME, ETHNIC_IDS, MACRO_IDS, allowed_modifier_ids
 from .pose_catalog import REST_POSE_ID, allowed_pose_ids, pose_units_map
 
+from .body_measures import parse_body_cm
+
 MACRO_KEYS = ("gender", "age", "weight", "muscle")
 HEIGHT_KEYS = ("height", "height_cm")
 TOP_LEVEL = frozenset(
     MACRO_KEYS
     + HEIGHT_KEYS
-    + ("proportions", "african", "asian", "caucasian", "modifiers", "pose", "pose_units")
+    + (
+        "proportions",
+        "african",
+        "asian",
+        "caucasian",
+        "modifiers",
+        "pose",
+        "pose_units",
+        "body",
+    )
 )
 
 
@@ -67,6 +78,7 @@ class HumanModifierRequest:
     asian: float = 1.0 / 3.0
     caucasian: float = 1.0 / 3.0
     extra: dict[str, float] = field(default_factory=dict)
+    body_cm: dict[str, float] = field(default_factory=dict)
     pose_id: str = REST_POSE_ID
     pose_units: dict[str, float] = field(default_factory=dict)
 
@@ -96,6 +108,11 @@ class HumanModifierRequest:
                     raise ModifierRequestError(f"unknown modifier: {name}")
                 extra[name] = _clamp_modifier(name, value)
 
+        try:
+            body_cm = parse_body_cm(payload.get("body"))
+        except ValueError as exc:
+            raise ModifierRequestError(str(exc)) from exc
+
         values = {key: _as_unit(payload[key], key) for key in MACRO_KEYS if key in payload}
         height: Optional[float] = 0.5
         height_cm: Optional[float] = None
@@ -104,6 +121,9 @@ class HumanModifierRequest:
             height_cm = _as_cm(payload["height_cm"])
         elif "height" in payload:
             height = _as_unit(payload["height"], "height")
+        elif "height" in body_cm:
+            height = None
+            height_cm = _as_cm(body_cm["height"])
         elif ALIAS_TO_FULLNAME["height"] in extra:
             height = extra[ALIAS_TO_FULLNAME["height"]]
 
@@ -120,14 +140,15 @@ class HumanModifierRequest:
             height=height,
             height_cm=height_cm,
             extra=extra,
+            body_cm=body_cm,
             pose_id=pose_id,
             pose_units=pose_units,
             **values,
             **extras_alias,
         )
 
-    def as_dict(self) -> dict[str, float]:
-        payload: dict[str, float] = {
+    def as_dict(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {
             "gender": self.gender,
             "age": self.age,
             "weight": self.weight,
@@ -142,6 +163,8 @@ class HumanModifierRequest:
         else:
             payload["height"] = float(self.height if self.height is not None else 0.5)
         payload.update(self.extra)
+        if self.body_cm:
+            payload["body"] = dict(self.body_cm)
         if self.pose_id != REST_POSE_ID:
             payload["pose"] = {"id": self.pose_id}
         if self.pose_units:

@@ -47,6 +47,48 @@ def test_as_dict_echoes_height_cm():
     assert "height" not in applied
 
 
+def test_accepts_body_cm_measures():
+    req = HumanModifierRequest.parse(
+        {
+            "height_cm": 165,
+            "body": {
+                "bust": 90,
+                "waist": 70,
+                "hips": 95,
+                "bust_line": 25,
+                "arm_pose_angle": 45,
+                "leg_circ": 55,
+            },
+        }
+    )
+    assert req.height_cm == 165.0
+    assert req.body_cm == {
+        "bust": 90.0,
+        "waist": 70.0,
+        "hips": 95.0,
+        "bust_line": 25.0,
+        "arm_pose_angle": 45.0,
+        "leg_circ": 55.0,
+    }
+    applied = req.as_dict()
+    assert applied["body"]["bust"] == 90.0
+    assert applied["body"]["bust_line"] == 25.0
+    assert applied["body"]["arm_pose_angle"] == 45.0
+
+
+def test_body_height_promotes_to_height_cm():
+    req = HumanModifierRequest.parse({"body": {"height": 160, "bust": 88}})
+    assert req.height_cm == 160.0
+    assert req.body_cm["height"] == 160.0
+
+
+def test_rejects_invalid_body_cm():
+    with pytest.raises(ModifierRequestError, match="body.bust"):
+        HumanModifierRequest.parse({"body": {"bust": -1}})
+    with pytest.raises(ModifierRequestError, match="JSON object"):
+        HumanModifierRequest.parse({"body": []})
+
+
 def test_accepts_fullname_modifiers_and_proportions():
     req = HumanModifierRequest.parse(
         {

@@ -76,3 +76,25 @@ def test_generate_applies_tpose_differently_from_rest():
     assert tpose["pose"]["id"] == "tpose"
     assert tpose["obj"] != rest["obj"]
 
+
+@pytest.mark.integration
+def test_generate_applies_body_cm_bust_differently():
+    narrow = generate(
+        {
+            "height_cm": 165,
+            "gender": 0.0,
+            "body": {"bust": 82, "waist": 64, "hips": 88},
+        }
+    )
+    wide = generate(
+        {
+            "height_cm": 165,
+            "gender": 0.0,
+            "body": {"bust": 98, "waist": 78, "hips": 104},
+        }
+    )
+    assert narrow["applied"]["body"]["bust"] == 82.0
+    assert wide["applied"]["body"]["bust"] == 98.0
+    assert narrow["obj"] != wide["obj"]
+    assert qt_imported() is False
+

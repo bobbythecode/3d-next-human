@@ -7,6 +7,7 @@ from typing import Any
 from .bootstrap import ensure_runtime, qt_imported
 from .catalog import ALIAS_TO_FULLNAME
 from .mesh_export import export_basemesh
+from .body_measures import apply_body_cm
 from .modifier_request import HumanModifierRequest
 from .pose_catalog import apply_pose
 
@@ -75,6 +76,8 @@ def generate(payload: object) -> dict[str, Any]:
         _set_height_cm(person, request.height_cm)
     else:
         person.applyAllTargets()
+    if request.body_cm:
+        apply_body_cm(person, request.body_cm)
     pose = apply_pose(person, request.pose_id, request.pose_units)
     if qt_imported():
         raise HumanSessionError("Qt was imported during generate; headless contract broken")
