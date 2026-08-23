@@ -14,24 +14,31 @@ SERVICE = "human-api"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8001
 
-LICENSE_BODY = {
-    "license": "AGPL-3.0",
-    "code": "https://github.com/bobbythecode/3d-next-human",
-    "assets": "CC0-1.0",
-    "output": "user-data",
-    "files": [
-        "LICENSE.md",
-        "LICENSE.CODE.md",
-        "LICENSE.ASSETS.md",
-        "documents/guides/license.md",
-    ],
-    "note": (
-        "Source of this network service is the 3d-next-human repository "
-        "(MakeHuman + service/ facade), AGPL-3.0. Bundled assets are CC0. "
-        "Exported OBJ is user data (LICENSE.md section D). "
-        "AGPL §13 corresponding source: see `code` URL and LICENSE files."
-    ),
-}
+def _license_body() -> dict[str, Any]:
+    code_url = os.environ.get(
+        "HUMAN_API_GIT_URL",
+        "https://github.com/bobbythecode/3d-next-human",
+    )
+    revision = os.environ.get("HUMAN_API_GIT_SHA", "unknown")
+    return {
+        "license": "AGPL-3.0",
+        "code": code_url,
+        "revision": revision,
+        "assets": "CC0-1.0",
+        "output": "user-data",
+        "files": [
+            "LICENSE.md",
+            "LICENSE.CODE.md",
+            "LICENSE.ASSETS.md",
+            "documents/guides/license.md",
+        ],
+        "note": (
+            "Source of this network service is the 3d-next-human repository "
+            "(MakeHuman + service/ facade), AGPL-3.0. Bundled assets are CC0. "
+            "Exported OBJ is user data (LICENSE.md section D). "
+            "AGPL §13 corresponding source: see `code` URL, `revision`, and LICENSE files."
+        ),
+    }
 
 
 def health_payload() -> dict[str, Any]:
@@ -39,7 +46,7 @@ def health_payload() -> dict[str, Any]:
 
 
 def license_payload() -> dict[str, Any]:
-    return dict(LICENSE_BODY)
+    return _license_body()
 
 
 class HumanHttpApi(BaseHTTPRequestHandler):

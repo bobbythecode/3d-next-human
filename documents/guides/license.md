@@ -1,6 +1,7 @@
 # License — 3d-next-human / human-api
 
-> อัปเดต: 2026-08-23 · ข้อความเต็ม: [`../../LICENSE.md`](../../LICENSE.md)
+> อัปเดต: 2026-08-23 · ข้อความเต็ม: [`../../LICENSE.md`](../../LICENSE.md) หมวด A–E  
+> **สรุประดับสแตก (อ่านก่อน):** [`../../../3d-next-portal/documents/guides/agpl-makehuman.md`](../../../3d-next-portal/documents/guides/agpl-makehuman.md)
 
 ## สรุปสั้น
 
@@ -27,6 +28,6 @@ AGPL ติดเมื่อคัดลอกหรือ import ซอร์�
 
 ## Endpoint
 
-`GET /license` → JSON ชี้ AGPL · URL ซอร์ส · หมายเหตุว่า OBJ เป็นข้อมูลผู้ใช้ (หมวด D)
+`GET /license` → JSON ชี้ AGPL · URL ซอร์ส · assets = CC0 · output = user-data · ไฟล์ LICENSE
 
 ตัวอย่าง payload: ดู `service/http_api.py` · คลาส [`../classes/HumanHttpApi.md`](../classes/HumanHttpApi.md)
