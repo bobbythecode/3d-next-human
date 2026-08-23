@@ -21,8 +21,12 @@ HTTP facade ของกระบวนการ AGPL — health / license / gen
 | ชื่อ | ชนิด | ผู้ใช้ต่อ |
 |------|------|-----------|
 | health | `{ ok, service: "human-api" }` | เกต |
+| license | `{ license, code, assets, output, files, note }` | AGPL §13 · ดู [`../guides/license.md`](../guides/license.md) |
 | modifiers | `{ categories }` ตามหมวดเป้า | แผง Macro P5.7b |
+| poses | แคตตาล็อกท่า | P5.7d |
 | generate | `{ height_cm, applied, unit, up, obj }` | upload P5.5 |
+
+`GET /license` ชี้ **AGPL-3.0** · URL ซอร์ส repo นี้ · assets = CC0 · output OBJ = ข้อมูลผู้ใช้ (LICENSE.md หมวด D)
 
 พอร์ต dev: `127.0.0.1:8001`
 
@@ -34,7 +38,7 @@ HTTP facade ของกระบวนการ AGPL — health / license / gen
 
 ## Tests
 
-- `tests/test_http_health.py`
+- `tests/test_http_health.py` (health + license)
 
 ## Anti-patterns
 

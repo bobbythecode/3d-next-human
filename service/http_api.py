@@ -17,12 +17,29 @@ DEFAULT_PORT = 8001
 LICENSE_BODY = {
     "license": "AGPL-3.0",
     "code": "https://github.com/bobbythecode/3d-next-human",
-    "note": "Source of this network service is the 3d-next-human repository. Exported OBJ is user data (LICENSE.md section D).",
+    "assets": "CC0-1.0",
+    "output": "user-data",
+    "files": [
+        "LICENSE.md",
+        "LICENSE.CODE.md",
+        "LICENSE.ASSETS.md",
+        "documents/guides/license.md",
+    ],
+    "note": (
+        "Source of this network service is the 3d-next-human repository "
+        "(MakeHuman + service/ facade), AGPL-3.0. Bundled assets are CC0. "
+        "Exported OBJ is user data (LICENSE.md section D). "
+        "AGPL §13 corresponding source: see `code` URL and LICENSE files."
+    ),
 }
 
 
 def health_payload() -> dict[str, Any]:
     return {"ok": True, "service": SERVICE}
+
+
+def license_payload() -> dict[str, Any]:
+    return dict(LICENSE_BODY)
 
 
 class HumanHttpApi(BaseHTTPRequestHandler):
@@ -45,7 +62,7 @@ class HumanHttpApi(BaseHTTPRequestHandler):
             self._send_json(200, health_payload())
             return
         if path == "/license":
-            self._send_json(200, LICENSE_BODY)
+            self._send_json(200, license_payload())
             return
         if path == "/internal/humans/modifiers":
             from .catalog import catalog_payload

@@ -1,15 +1,16 @@
 # 3d-next — human-api (µService)
 
-> Status: **green** · G-P5.7 ยืนยันตา 2026-08-18 · **G-P5.7b ผ่าน** (Macro catalog + portal) · แผนเต็ม: [`../../../3d-next-portal/documents/plans/p5_7-human-api.md`](../../../3d-next-portal/documents/plans/p5_7-human-api.md)  
-> เกต: G-P5.7 ใน [`../../../3d-next-portal/documents/specifications/roadmap/plan.md`](../../../3d-next-portal/documents/specifications/roadmap/plan.md)
+> Status: **green** · G-P5.7 ยืนยันตา 2026-08-18 · **G-P5.7b–d ผ่าน** (Macro · Head–Feet · Pose) · แผนเต็ม: [`../../../3d-next-portal/documents/plans/p5_7-human-api.md`](../../../3d-next-portal/documents/plans/p5_7-human-api.md)  
+> เกต: G-P5.7 ใน [`../../../3d-next-portal/documents/specifications/roadmap/plan.md`](../../../3d-next-portal/documents/specifications/roadmap/plan.md)  
+> License: [`../guides/license.md`](../guides/license.md) · [`../../LICENSE.md`](../../LICENSE.md) หมวด A–E
 
-Repo นี้คือ MakeHuman (**AGPL-3.0** ซอร์ส · **CC0** assets · ผล export เป็นข้อมูลผู้ใช้ — ดู `LICENSE.md`)
+Repo นี้คือ MakeHuman (**AGPL-3.0** ซอร์สรวม `service/` · **CC0** assets · ผล export เป็นข้อมูลผู้ใช้ — หมวด D · เครือข่าย §13 ผ่าน `GET /license` — หมวด E)
 
 เป้าหมาย 3d-next: รันเป็น **HTTP service แทน desktop** เพื่อให้ `3d-next-service` เรียกได้โดย**ไม่นำซอร์สนี้เข้า Nest**
 
 ```text
 ✅ Facade HTTP อยู่ใน repo นี้ (จึงเป็น AGPL ด้วย)
-✅ GET /health · POST /internal/humans/generate → OBJ เมตร Y-up · เท้าที่ Y=0 (เทียบ mean_all)
+✅ GET /health · GET /license · POST /internal/humans/generate → OBJ เมตร Y-up · เท้าที่ Y=0 (เทียบ mean_all)
 ✅ Dev: `scripts/dev-up.cmd` (Windows) หรือ `scripts/dev-up.sh` — ห้ามบังคับ docker build
 ✅ Docker ภายหลัง/opt-in ใน 3d-next-container คนละ image จาก tailor/Nest
 
@@ -30,4 +31,4 @@ scripts\human\generate.cmd --out %TEMP%\human.obj
 
 แล้วใน editor: หุ่นชนผ้า → อัปโหลด OBJ · ผ้าชนเมื่อกดจำลอง
 
-UI สไลเดอร์ Macro + Head–Feet ใน portal = **P5.7b + P5.7c ผ่าน** 2026-08-18 — แผน: [`../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md`](../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md) · ถัดไป Pose = P5.7d
+UI สไลเดอร์ Macro + Head–Feet + Pose ใน portal = **P5.7b–d ผ่าน** 2026-08-18 — แผน: [`../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md`](../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md)

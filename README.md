@@ -6,7 +6,10 @@
 
 รันแบบ **HTTP ไม่มีหน้าต่าง** แทนแอปเดสก์ท็อป — แผน: [`documents/plans/human-api.md`](documents/plans/human-api.md)
 
-Python ใน repo นี้เป็น **AGPL** · พี่น้อง `3d-next-service` เรียกได้แค่ REST ห้าม import
+**License:** ซอร์ส (**รวม `service/`**) = **AGPL-3.0** · assets = **CC0** · OBJ จาก generate = **ข้อมูลผู้ใช้** (หมวด D)  
+สรุปไทย: [`documents/guides/license.md`](documents/guides/license.md) · เต็ม: [`LICENSE.md`](LICENSE.md) (หมวด A–E) · `GET /license` สำหรับ AGPL §13
+
+พี่น้อง `3d-next-service` / portal / tailor เรียกได้แค่ REST — ห้าม import หรือ COPY ซอร์สนี้
 
 **G-P5.7 ผ่าน** — generate OBJ หน่วยเมตร แกน Y ขึ้น · เท้าที่ Y=0 · อัปโหลดทาบ 2D/3D · ส่ง macros แล้วหุ่นเปลี่ยน (ยืนยันตา 2026-08-18)
 

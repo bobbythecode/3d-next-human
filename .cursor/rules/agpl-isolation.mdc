@@ -5,11 +5,13 @@ alwaysApply: true
 
 # agpl-isolation (human)
 
-ซอร์สใน repo นี้เป็น **AGPL-3.0** (MakeHuman)
+ซอร์สใน repo นี้เป็น **AGPL-3.0** (MakeHuman + `service/` human-api)  
+สรุป: `documents/guides/license.md` · เต็ม: `LICENSE.md` หมวด A–E
 
 ```text
 ✅ HTTP facade สำหรับ generate หุ่น อยู่ที่นี่
 ✅ ผล OBJ = ข้อมูลผู้ใช้ (LICENSE.md หมวด D)
+✅ GET /license ชี้ซอร์ส (AGPL §13 ถ้าเปิดเน็ต)
 ✅ Dev รันบนโฮสต์ให้เร็ว — ไม่บังคับ Docker เป็นเกต
 
 ❌ อย่าย้าย makehuman ไป 3d-next-service / 3d-next-tailor / 3d-next-portal
