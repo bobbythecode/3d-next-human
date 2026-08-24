@@ -1,38 +1,37 @@
 # Class: `HumanModifierRequest`
 
-> Phase: P5.7  
 > Status: green
 
-## Responsibility (หนึ่งอย่าง)
+## Responsibility (one thing)
 
-parse JSON macros และ `modifiers` fullName ของ MakeHuman — 0..1 ตามสไลเดอร์ Macro ยกเว้น `height_cm` · สไลเดอร์อื่น -1..1
+Parse JSON macros and MakeHuman `modifiers` fullName — 0..1 for Macro sliders except `height_cm` · other sliders -1..1
 
 ## Input
 
-| ชื่อ | ชนิด | แหล่ง |
-|------|------|-------|
+| Name | Type | Source |
+|------|------|--------|
 | body | object | `POST /internal/humans/generate` |
 
 ## Output
 
-| ชื่อ | ชนิด | ผู้ใช้ต่อ |
-|------|------|-----------|
+| Name | Type | Consumer |
+|------|------|----------|
 | gender, age, weight, muscle | float 0..1 | `HumanSession` |
-| height | float 0..1 หรือไม่มี | `macrodetails-height/Height` |
-| height_cm | float > 0 หรือไม่มี | binary search บน modifier แล้ววัด `getHeightCm` |
-| as_dict | object | ใส่ใน JSON `applied` ให้ผู้เรียกเห็นค่าที่ใช้ |
+| height | float 0..1 or absent | `macrodetails-height/Height` |
+| height_cm | float > 0 or absent | binary search on the modifier then measure `getHeightCm` |
+| as_dict | object | placed in JSON `applied` so the caller sees the values used |
 
-ห้ามเงียบทิ้งฟิลด์ที่ส่งมา (unknown = 400)
+Do not silently drop fields that were sent (unknown = 400)
 
-## ไม่ทำ (out of scope)
+## Out of scope
 
-- แมป YAML `body:` ของ garment-tailor
-- ผม / เสื้อผ้า / Pose / Skin
-- เดาสเกลจาก bbox ฝั่ง Nest
+- map external YAML body schemas
+- hair / clothes / Pose / Skin
+- guess scale from bbox on the caller side
 
-## Dependencies (inject / mock ได้)
+## Dependencies (inject / mock)
 
-- ไม่มี MakeHuman — parse อย่างเดียว
+- no MakeHuman — parse only
 
 ## Tests
 
@@ -40,5 +39,5 @@ parse JSON macros และ `modifiers` fullName ของ MakeHuman — 0..1 �
 
 ## Anti-patterns
 
-- รับ `height` กับ `height_cm` พร้อมกัน
-- hardcode เลขส่วนสูงในเซลล์เรียก
+- accept `height` and `height_cm` at the same time
+- hardcode a height number in the calling cell

@@ -1,11 +1,11 @@
-"""Accept garment-tailor authored body keys; fit MH measure rulers when known."""
+"""Accept authored body measure keys; fit MH measure rulers when known."""
 
 from __future__ import annotations
 
 import math
 from typing import Mapping
 
-# Same authored set as portal BodyMeasurements / mean_*.yaml (no `_` derived).
+# Authored body keys only (no `_` derived).
 AUTHORED_BODY_KEYS = frozenset(
     {
         "arm_length",

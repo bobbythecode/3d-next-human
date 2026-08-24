@@ -1,40 +1,39 @@
 # Class: `HumanHttpApi`
 
-> Phase: P5.7  
 > Status: green
 
-## Responsibility (หนึ่งอย่าง)
+## Responsibility (one thing)
 
-HTTP facade ของกระบวนการ AGPL — health / license / generate โดยไม่เปิดหน้าต่าง desktop
+HTTP facade of the AGPL process — health / license / generate without opening a desktop window
 
 ## Input
 
-| ชื่อ | ชนิด | แหล่ง |
-|------|------|-------|
-| GET /health | — | Nest / `health.sh` |
-| GET /license | — | AGPL §13 ถ้าเปิดเน็ต |
-| GET /internal/humans/modifiers | — | Nest / portal |
-| POST /internal/humans/generate | `HumanModifierRequest` | Nest / `generate.sh` |
+| Name | Type | Source |
+|------|------|--------|
+| GET /health | — | HTTP clients / smoke scripts |
+| GET /license | — | AGPL §13 when offered over a network |
+| GET /internal/humans/modifiers | — | HTTP clients |
+| POST /internal/humans/generate | `HumanModifierRequest` | HTTP clients |
 
 ## Output
 
-| ชื่อ | ชนิด | ผู้ใช้ต่อ |
-|------|------|-----------|
-| health | `{ ok, service: "human-api" }` | เกต |
-| license | `{ license, code, assets, output, files, note }` | AGPL §13 · ดู [`../guides/license.md`](../guides/license.md) |
-| modifiers | `{ categories }` ตามหมวดเป้า | แผง Macro P5.7b |
-| poses | แคตตาล็อกท่า | P5.7d |
-| generate | `{ height_cm, applied, unit, up, obj }` | upload P5.5 |
+| Name | Type | Consumer |
+|------|------|----------|
+| health | `{ ok, service: "human-api" }` | operators / smoke checks |
+| license | `{ license, code, assets, output, files, note }` | AGPL §13 · see [`../guides/license.md`](../guides/license.md) |
+| modifiers | `{ categories }` by target group | Macro / body slider UIs |
+| poses | pose catalog | pose pickers |
+| generate | `{ height_cm, applied, unit, up, obj }` | mesh consumers |
 
-`GET /license` ชี้ **AGPL-3.0** · URL ซอร์ส repo นี้ · assets = CC0 · output OBJ = ข้อมูลผู้ใช้ (LICENSE.md หมวด D)
+`GET /license` points at **AGPL-3.0** · source URL of this repo · assets = CC0 · output OBJ = user data (LICENSE.md section D)
 
-พอร์ต dev: `127.0.0.1:8001`
+Dev port: `127.0.0.1:8001`
 
-## ไม่ทำ
+## Out of scope
 
-- import เข้า Nest
+- embedding this package inside another app
 - spawn MakeHuman desktop
-- path เครื่องใน DTO
+- machine-local paths in the DTO
 
 ## Tests
 
@@ -42,5 +41,5 @@ HTTP facade ของกระบวนการ AGPL — health / license / gen
 
 ## Anti-patterns
 
-- คืนซอร์ส Python ของ MH ใน JSON เมช
-- บังคับ docker build เพื่อเกต
+- return MH Python source inside mesh JSON
+- require a docker build for the gate

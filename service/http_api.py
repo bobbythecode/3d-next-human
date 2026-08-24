@@ -33,7 +33,7 @@ def _license_body() -> dict[str, Any]:
             "documents/guides/license.md",
         ],
         "note": (
-            "Source of this network service is the 3d-next-human repository "
+            "Source of this network service is this repository "
             "(MakeHuman + service/ facade), AGPL-3.0. Bundled assets are CC0. "
             "Exported OBJ is user data (LICENSE.md section D). "
             "AGPL §13 corresponding source: see `code` URL, `revision`, and LICENSE files."

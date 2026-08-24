@@ -12,7 +12,8 @@ def test_license_points_at_agpl_source():
     assert payload["license"] == "AGPL-3.0"
     assert payload["assets"] == "CC0-1.0"
     assert payload["output"] == "user-data"
-    assert "3d-next-human" in payload["code"]
+    assert payload["code"].startswith("https://")
+    assert "github.com" in payload["code"]
     assert "revision" in payload
     assert "LICENSE.md" in payload["files"]
     assert "section D" in payload["note"]

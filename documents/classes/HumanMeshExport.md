@@ -1,36 +1,35 @@
 # Class: `HumanMeshExport`
 
-> Phase: P5.7  
 > Status: green
 
-## Responsibility (หนึ่งอย่าง)
+## Responsibility (one thing)
 
-แปลงเมช basemesh ของ MakeHuman เป็น Wavefront OBJ **เมตร Y-up** สามเหลี่ยม ตัด helper
+Convert the MakeHuman basemesh to Wavefront OBJ **metres Y-up**, triangulated, helpers stripped
 
 ## Input
 
-| ชื่อ | ชนิด | แหล่ง |
-|------|------|-------|
+| Name | Type | Source |
+|------|------|--------|
 | coords | (N,3) dm Y-up | `Human.meshData.coord` |
 | faces | (F,3\|4) | `meshData.fvert` |
-| face_mask | (F,) bool | `meshData.face_mask` (helper ถูก mask แล้ว) |
+| face_mask | (F,) bool | `meshData.face_mask` (helpers already masked) |
 
 ## Output
 
-| ชื่อ | ชนิด | ผู้ใช้ต่อ |
-|------|------|-----------|
-| obj | str | JSON `obj` / `generate.sh` / upload P5.5 |
-| unit | `"m"` | ผู้เรียก |
-| up | `"y"` | ผู้เรียก |
+| Name | Type | Consumer |
+|------|------|----------|
+| obj | str | JSON `obj` / HTTP callers |
+| unit | `"m"` | caller |
+| up | `"y"` | caller |
 
-สเกล: **หาร 10** (เดซิเมตร → เมตร) · fan-triangulate quad  
-พื้น: MH seed ต้นที่เชิงกราน — เลื่อนให้ Y ต่ำสุดของหน้าที่ export = 0 (เทียบ `mean_all` / ช่อง Feet on ground ของ MH) · ไม่เขียน vertex helper ที่ไม่มีหน้า
+Scale: **divide by 10** (decimetres → metres) · fan-triangulate quads  
+Ground: MH seed origin is at the pelvis — shift so the lowest Y of exported faces = 0 (MH “Feet on ground”) · do not write helper vertices that have no faces
 
-## ไม่ทำ
+## Out of scope
 
-- texture / MTL / เสื้อผ้า proxy
-- เดาสเกลจาก bbox
-- เปิด Qt / OpenGL buffer
+- texture / MTL / clothing proxies
+- guess scale from bbox
+- open Qt / OpenGL buffers
 
 ## Tests
 
@@ -38,6 +37,6 @@
 
 ## Anti-patterns
 
-- ส่ง helper- / joint- ออกไปชนผ้า
-- หน่วยเดซิเมตรปนเมตร
-- ปล่อยต้นพิกัดเชิงกรานแล้วเรียกว่าตรง `mean_all`
+- send helper- / joint- vertices in the export
+- mix decimetre and metre units
+- leave the origin at the pelvis and call that feet-on-ground

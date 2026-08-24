@@ -1,22 +1,22 @@
 ---
-description: Keep MakeHuman AGPL in this repo; HTTP only to siblings
+description: Keep MakeHuman AGPL in this repo; expose HTTP only
 alwaysApply: true
 ---
 
 # agpl-isolation (human)
 
-ซอร์สใน repo นี้เป็น **AGPL-3.0** (MakeHuman + `service/` human-api)  
-สรุป: `documents/guides/license.md` · เต็ม: `LICENSE.md` หมวด A–E
+Source in this repo is **AGPL-3.0** (MakeHuman + `service/` human-api)  
+Summary: `documents/guides/license.md` · Full text: `LICENSE.md` sections A–E
 
 ```text
-✅ HTTP facade สำหรับ generate หุ่น อยู่ที่นี่
-✅ ผล OBJ = ข้อมูลผู้ใช้ (LICENSE.md หมวด D)
-✅ GET /license ชี้ซอร์ส (AGPL §13 ถ้าเปิดเน็ต)
-✅ Dev รันบนโฮสต์ให้เร็ว — ไม่บังคับ Docker เป็นเกต
+✅ HTTP facade for generating avatars lives here
+✅ Exported OBJ = user data (LICENSE.md section D)
+✅ GET /license points at the source (AGPL §13 when offered over a network)
+✅ Dev runs on the host for speed — Docker is not a gate
 
-❌ อย่าย้าย makehuman ไป 3d-next-service / 3d-next-tailor / 3d-next-portal
-❌ อย่าแนะนำให้ Nest pip-install หรือ COPY ซอร์สนี้
-❌ อย่าผูกเกตกับหน้าต่าง desktop
+❌ Do not move makehuman source into another product
+❌ Do not pip-install or COPY this source into another app
+❌ Do not tie the gate to a desktop window
 ```
 
-แผน: sibling `3d-next-portal/documents/plans/p5_7-human-api.md`
+Plan: `documents/plans/human-api.md`

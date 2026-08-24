@@ -1,33 +1,32 @@
-# License — 3d-next-human / human-api
+# License — human-api
 
-> อัปเดต: 2026-08-23 · ข้อความเต็ม: [`../../LICENSE.md`](../../LICENSE.md) หมวด A–E  
-> **สรุประดับสแตก (อ่านก่อน):** [`../../../3d-next-portal/documents/guides/agpl-makehuman.md`](../../../3d-next-portal/documents/guides/agpl-makehuman.md)
+> Updated: 2026-08-23 · Full text: [`../../LICENSE.md`](../../LICENSE.md) sections A–E
 
-## สรุปสั้น
+## Short summary
 
-| ส่วน | สัญญา | ไฟล์ |
-|------|--------|------|
-| ซอร์ส MakeHuman + `service/` (human-api) | **AGPL-3.0** (หรือใหม่กว่า) | `LICENSE.CODE.md` · หมวด B + **E** |
-| สินทรัพย์ฐาน (basemesh / targets / …) | **CC0 1.0** | `LICENSE.ASSETS.md` · หมวด C |
-| ผล export (OBJ ฯลฯ) จาก generate | **ข้อมูลผู้ใช้** | หมวด D |
+| Part | License | Files |
+|------|---------|-------|
+| MakeHuman source + `service/` (human-api) | **AGPL-3.0** (or later) | `LICENSE.CODE.md` · sections B + **E** |
+| Bundled assets (basemesh / targets / …) | **CC0 1.0** | `LICENSE.ASSETS.md` · section C |
+| Generate/export output (OBJ, etc.) | **user data** | section D |
 
-## ทำไมแยกจาก Nest / portal / tailor
+## Isolation
 
-AGPL ติดเมื่อคัดลอกหรือ import ซอร์สนี้ · **ไม่ติด** แค่เพราะเรียก HTTP
+AGPL attaches when this source is copied or imported. It does **not** attach merely from an HTTP call.
 
 ```text
-✅ human-api คนละโปรเซส / คนละ image
-✅ Nest เรียก HUMAN_API_URL · portal ผ่าน Nest เท่านั้น
-✅ GET /license ชี้ repo นี้ (AGPL §13 ถ้าเปิดเน็ต)
+✅ human-api runs as its own process / image
+✅ Callers use HTTP only
+✅ GET /license points at this repo (AGPL §13 when offered over a network)
 
-❌ pip-install / COPY makehuman เข้า Nest หรือ tailor-api
-❌ รวม human + Nest ใน process เดียวแล้วเรียกว่า isolate
+❌ pip-install / COPY makehuman into another product
+❌ Combine human-api with another app in one process and call that isolation
 ```
 
-รายละเอียดวิศวกรรม: [`../plans/human-api.md`](../plans/human-api.md) · rule: `.cursor/rules/agpl-isolation.mdc`
+Engineering detail: [`../plans/human-api.md`](../plans/human-api.md) · rule: `.cursor/rules/agpl-isolation.mdc`
 
 ## Endpoint
 
-`GET /license` → JSON ชี้ AGPL · URL ซอร์ส · assets = CC0 · output = user-data · ไฟล์ LICENSE
+`GET /license` → JSON pointing at AGPL · source URL · assets = CC0 · output = user-data · LICENSE files
 
-ตัวอย่าง payload: ดู `service/http_api.py` · คลาส [`../classes/HumanHttpApi.md`](../classes/HumanHttpApi.md)
+Example payload: see `service/http_api.py` · class [`../classes/HumanHttpApi.md`](../classes/HumanHttpApi.md)

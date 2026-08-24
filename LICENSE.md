@@ -7,7 +7,7 @@ A. The overall license setup for MakeHuman
 B. The license for the source code as such
 C. The license for the bundled assets
 D. Concerning the output from MakeHuman
-E. 3d-next-human / human-api (network facade)
+E. human-api (network facade)
 
 
 A. The overall license setup for MakeHuman
@@ -18,10 +18,10 @@ The MakeHuman application consists of two separate parts:
 * Source code: the program logic that powers the application. 
 * Assets: The graphical data that the application operates on
 
-This repository (`3d-next-human`) is a MakeHuman tree plus a headless HTTP
-facade (`service/`, aka **human-api**). Sections A–D are the upstream MakeHuman
-license statement. Section E records how that statement applies when the same
-code is offered as a network service in the 3d-next stack.
+This repository is a MakeHuman tree plus a headless HTTP facade (`service/`,
+aka **human-api**). Sections A–D are the upstream MakeHuman license statement.
+Section E records how that statement applies when the same code is offered as
+a network service.
 
 B. The license for the source code as such
 ------------------------------------------
@@ -100,8 +100,8 @@ asset repositories, it is your own responsibility to make sure you abide by
 its specific license. That license might be different from the one covering
 the assets bundled by MakeHuman.
 
-E. 3d-next-human / human-api (network facade)
----------------------------------------------
+E. human-api (network facade)
+-----------------------------
 
 ### Source code of this repository
 
@@ -136,11 +136,10 @@ Default source URL advertised by the service:
 
 `https://github.com/bobbythecode/3d-next-human`
 
-### Sibling products (not AGPL merely by calling human-api)
+### Separate callers (not AGPL merely by calling human-api)
 
-Calling human-api over HTTP from separate programs (for example
-`3d-next-service`, `3d-next-portal`, `3d-next-tailor`) does **not** by itself
-make those programs AGPL. Copying, importing, or bundling this repository’s
-Python into those products does.
+Calling human-api over HTTP from a separate program does **not** by itself
+make that program AGPL. Copying, importing, or bundling this repository’s
+Python into another product does.
 
-This section is an engineering boundary for the 3d-next stack, not legal advice.
+This section is an engineering boundary for operators of human-api, not legal advice.

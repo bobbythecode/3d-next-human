@@ -1,34 +1,33 @@
-# 3d-next — human-api (µService)
+# human-api
 
-> Status: **green** · G-P5.7 ยืนยันตา 2026-08-18 · **G-P5.7b–d ผ่าน** (Macro · Head–Feet · Pose) · แผนเต็ม: [`../../../3d-next-portal/documents/plans/p5_7-human-api.md`](../../../3d-next-portal/documents/plans/p5_7-human-api.md)  
-> เกต: G-P5.7 ใน [`../../../3d-next-portal/documents/specifications/roadmap/plan.md`](../../../3d-next-portal/documents/specifications/roadmap/plan.md)  
-> License: [`../guides/license.md`](../guides/license.md) · [`../../LICENSE.md`](../../LICENSE.md) หมวด A–E
+> Status: **green** · Macro · Head–Feet · Pose supported  
+> License: [`../guides/license.md`](../guides/license.md) · [`../../LICENSE.md`](../../LICENSE.md) sections A–E
 
-Repo นี้คือ MakeHuman (**AGPL-3.0** ซอร์สรวม `service/` · **CC0** assets · ผล export เป็นข้อมูลผู้ใช้ — หมวด D · เครือข่าย §13 ผ่าน `GET /license` — หมวด E)
+This repo is MakeHuman plus a headless HTTP facade (`service/`, **human-api**):
 
-เป้าหมาย 3d-next: รันเป็น **HTTP service แทน desktop** เพื่อให้ `3d-next-service` เรียกได้โดย**ไม่นำซอร์สนี้เข้า Nest**
+- Source (including `service/`) → **AGPL-3.0**
+- Bundled assets → **CC0**
+- Export output → **user data** (LICENSE section D)
+- Network offer → `GET /license` (LICENSE section E / AGPL §13)
+
+Goal: run as an **HTTP service instead of the desktop app**. Callers talk to this process over HTTP and must not import or vendor this tree.
 
 ```text
-✅ Facade HTTP อยู่ใน repo นี้ (จึงเป็น AGPL ด้วย)
-✅ GET /health · GET /license · POST /internal/humans/generate → OBJ เมตร Y-up · เท้าที่ Y=0 (เทียบ mean_all)
-✅ Dev: `scripts/dev-up.cmd` (Windows) หรือ `scripts/dev-up.sh` — ห้ามบังคับ docker build
-✅ Docker ภายหลัง/opt-in ใน 3d-next-container คนละ image จาก tailor/Nest
+✅ HTTP facade lives in this repo (so it is AGPL too)
+✅ GET /health · GET /license · POST /internal/humans/generate
+   → OBJ metres Y-up · feet at Y=0 (MH “Feet on ground”)
+✅ Dev: `scripts/dev-up.cmd` (Windows) or `scripts/dev-up.sh` — Docker is optional
+✅ Optional container image stays separate from other products
 
-❌ อย่าให้ 3d-next-service import แพ็กเกจนี้
-❌ อย่าคัดลอก makehuman/*.py ไป repo พี่น้อง
-❌ อย่าใช้หน้าต่าง Qt เป็นทางเกต
+❌ Do not import this package into another app
+❌ Do not copy makehuman/*.py into another repo
+❌ Do not use a Qt window as the gate
 ```
 
-Nest คุยผ่าน `HUMAN_API_URL` และ `3d-next-service/scripts/human/*.sh` (curl) เท่านั้น
-
-ทางเดินเกตตา (Windows):
+Local smoke (Windows):
 
 ```bat
 scripts\dev-up.cmd
-cd ..\3d-next-service
-scripts\human\generate.cmd --out %TEMP%\human.obj
 ```
 
-แล้วใน editor: หุ่นชนผ้า → อัปโหลด OBJ · ผ้าชนเมื่อกดจำลอง
-
-UI สไลเดอร์ Macro + Head–Feet + Pose ใน portal = **P5.7b–d ผ่าน** 2026-08-18 — แผน: [`../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md`](../../../3d-next-portal/documents/plans/p5_7b-human-modifiers-portal.md)
+Then `POST /internal/humans/generate` at `http://127.0.0.1:8001` (or curl against that URL).

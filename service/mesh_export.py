@@ -36,7 +36,7 @@ def collect_body_triangles(
 
 
 def place_feet_on_ground(coords: np.ndarray, vertex_ids: Sequence[int]) -> np.ndarray:
-    """Shift so the lowest used body vertex is Y=0 — same floor as GGG mean_all."""
+    """Shift so the lowest used body vertex is Y=0 (MH feet on ground)."""
     out = np.asarray(coords, dtype=np.float64).copy()
     ids = np.fromiter(vertex_ids, dtype=np.int64)
     if ids.size < 1:

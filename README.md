@@ -1,41 +1,35 @@
 # MakeHuman
 
-ซอร์สหลักของแอป MakeHuman (เอกสารต้นทางด้านล่างเป็นภาษาอังกฤษ)
+Main source of the MakeHuman application (upstream documentation below is in English).
 
-## 3d-next (P5.7)
+## human-api
 
-รันแบบ **HTTP ไม่มีหน้าต่าง** แทนแอปเดสก์ท็อป — แผน: [`documents/plans/human-api.md`](documents/plans/human-api.md)
+Run as **windowless HTTP** instead of the desktop app — plan: [`documents/plans/human-api.md`](documents/plans/human-api.md)
 
-**License:** ซอร์ส (**รวม `service/`**) = **AGPL-3.0** · assets = **CC0** · OBJ จาก generate = **ข้อมูลผู้ใช้** (หมวด D)  
-สรุปไทย: [`documents/guides/license.md`](documents/guides/license.md) · เต็ม: [`LICENSE.md`](LICENSE.md) (หมวด A–E) · `GET /license` สำหรับ AGPL §13
+**License:** source (**including `service/`**) = **AGPL-3.0** · assets = **CC0** · OBJ from generate = **user data** (section D)  
+Summary: [`documents/guides/license.md`](documents/guides/license.md) · Full text: [`LICENSE.md`](LICENSE.md) (sections A–E) · `GET /license` for AGPL §13
 
-พี่น้อง `3d-next-service` / portal / tailor เรียกได้แค่ REST — ห้าม import หรือ COPY ซอร์สนี้
+Callers use REST only — do not import or COPY this source into another product.
 
-**G-P5.7 ผ่าน** — generate OBJ หน่วยเมตร แกน Y ขึ้น · เท้าที่ Y=0 · อัปโหลดทาบ 2D/3D · ส่ง macros แล้วหุ่นเปลี่ยน (ยืนยันตา 2026-08-18)
+Supported: generate OBJ in metres, Y-up · feet at Y=0 · Macro / Head–Feet / Pose modifiers via `GET /internal/humans/modifiers` and `POST /internal/humans/generate`.
 
-**G-P5.7b ผ่าน** — `GET /internal/humans/modifiers` · แผง Macro ในไดอะล็อกหุ่นชนผ้า ผ่าน Nest (ยืนยันตา 2026-08-18)
-
-สภาพแวดล้อม: conda env `human` · Python 3.9 · numpy 1.x (อย่าใช้ Python 3.13 ของเครื่อง)
+Environment: conda env `human` · Python 3.9 · numpy 1.x (do not use the machine’s Python 3.13)
 
 ```text
 conda activate human
 python -m service.http_api
 ```
 
-วินโดวส์ (รายวัน):
+Windows (daily):
 
 ```bat
 scripts\dev-up.cmd
 ```
 
-จากนั้นที่ `3d-next-service`: `scripts\human\generate.cmd --out %TEMP%\human.obj --height-cm 160 --gender 1`  
-ใน editor: หุ่นชนผ้า → อัปโหลด OBJ (ผ้าชนเมื่อกดจำลอง)
-
-คำตอบ JSON มี `applied` (ค่าที่ใส่ใน modifier) และ `height_cm` ที่วัดจากเมช
-
 Git Bash: `HUMAN_PYTHON=.../envs/human/python.exe ./scripts/dev-up.sh`  
-`GET /health` · `POST /internal/humans/generate` ที่ `http://127.0.0.1:8001`  
-เกตนี้ห้ามติด PyQt5 · ห้ามให้ Nest import แพ็กเกจนี้
+`GET /health` · `POST /internal/humans/generate` at `http://127.0.0.1:8001`  
+The JSON response includes `applied` (values written into modifiers) and `height_cm` measured from the mesh.  
+This service must not pull in PyQt5 · other apps must not import this package.
 
 ## Current status
 

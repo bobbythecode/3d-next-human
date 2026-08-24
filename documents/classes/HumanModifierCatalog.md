@@ -1,28 +1,27 @@
 # Class: `HumanModifierCatalog`
 
-> Phase: P5.7b  
 > Status: green
 
-## Responsibility (หนึ่งอย่าง)
+## Responsibility (one thing)
 
-อ่าน JSON สไลเดอร์ของ MakeHuman แล้วจัดหมวดตามสัญญา portal — ไม่เปิด Qt
+Read MakeHuman slider JSON and group it for HTTP clients — do not open Qt
 
 ## Input
 
-| ชื่อ | ชนิด | แหล่ง |
-|------|------|-------|
-| `*_sliders.json` | ไฟล์ | `makehuman/data/modifiers` |
+| Name | Type | Source |
+|------|------|--------|
+| `*_sliders.json` | file | `makehuman/data/modifiers` |
 
 ## Output
 
-| ชื่อ | ชนิด | ผู้ใช้ต่อ |
-|------|------|-----------|
+| Name | Type | Consumer |
+|------|------|----------|
 | catalog_payload | `{ categories }` | `GET /internal/humans/modifiers` |
-| allowed_modifier_ids | set ของ fullName | `HumanModifierRequest` |
+| allowed_modifier_ids | set of fullName | `HumanModifierRequest` |
 
-## ไม่ทำ
+## Out of scope
 
-- Pose / Skin · UI · แมป YAML `body:`
+- Pose / Skin · UI · mapping external body YAML
 
 ## Tests
 
@@ -30,4 +29,4 @@
 
 ## Anti-patterns
 
-- ฮาร์ดโค้ดรายชื่อสไลเดอร์ใน Next
+- hardcode slider names in a client app
