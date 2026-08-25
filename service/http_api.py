@@ -81,6 +81,11 @@ class HumanHttpApi(BaseHTTPRequestHandler):
 
             self._send_json(200, pose_catalog_payload())
             return
+        if path == "/internal/humans/pose-pairs":
+            from .pose_pairs import pose_pairs_payload
+
+            self._send_json(200, pose_pairs_payload())
+            return
         self._send_json(404, {"ok": False, "error": "not found"})
 
     def do_POST(self) -> None:  # noqa: N802

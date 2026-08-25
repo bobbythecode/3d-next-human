@@ -123,3 +123,19 @@ def test_rejects_unknown_pose_and_pose_unit():
         HumanModifierRequest.parse({"pose": {"id": "no-such-pose"}})
     with pytest.raises(ModifierRequestError, match="unknown pose unit"):
         HumanModifierRequest.parse({"pose_units": {"NoSuchUnit": 0.5}})
+
+
+def test_include_rig_defaults_pose_pair():
+    req = HumanModifierRequest.parse({"include_rig": True})
+    assert req.include_rig is True
+    assert req.pose_pair_id == "tpose-to-rest"
+
+
+def test_pose_pair_requires_include_rig():
+    with pytest.raises(ModifierRequestError, match="include_rig"):
+        HumanModifierRequest.parse({"pose_pair_id": "tpose-to-rest"})
+
+
+def test_rejects_unknown_pose_pair():
+    with pytest.raises(ModifierRequestError, match="unknown pose_pair_id"):
+        HumanModifierRequest.parse({"include_rig": True, "pose_pair_id": "nope"})

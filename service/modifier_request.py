@@ -24,6 +24,8 @@ TOP_LEVEL = frozenset(
         "pose",
         "pose_units",
         "body",
+        "include_rig",
+        "pose_pair_id",
     )
 )
 
@@ -81,6 +83,8 @@ class HumanModifierRequest:
     body_cm: dict[str, float] = field(default_factory=dict)
     pose_id: str = REST_POSE_ID
     pose_units: dict[str, float] = field(default_factory=dict)
+    include_rig: bool = False
+    pose_pair_id: str | None = None
 
     @classmethod
     def parse(cls, payload: object) -> "HumanModifierRequest":
@@ -136,6 +140,8 @@ class HumanModifierRequest:
         }
         pose_id = _parse_pose(payload.get("pose"))
         pose_units = _parse_pose_units(payload.get("pose_units"))
+        include_rig = _parse_include_rig(payload.get("include_rig"))
+        pose_pair_id = _parse_pose_pair_id(payload.get("pose_pair_id"), include_rig)
         return cls(
             height=height,
             height_cm=height_cm,
@@ -143,6 +149,8 @@ class HumanModifierRequest:
             body_cm=body_cm,
             pose_id=pose_id,
             pose_units=pose_units,
+            include_rig=include_rig,
+            pose_pair_id=pose_pair_id,
             **values,
             **extras_alias,
         )
@@ -169,6 +177,10 @@ class HumanModifierRequest:
             payload["pose"] = {"id": self.pose_id}
         if self.pose_units:
             payload["pose_units"] = dict(self.pose_units)
+        if self.include_rig:
+            payload["include_rig"] = True
+        if self.pose_pair_id:
+            payload["pose_pair_id"] = self.pose_pair_id
         return payload
 
     def modifier_values(self) -> dict[str, float]:
@@ -229,3 +241,28 @@ def _parse_pose_units(raw_units: Any) -> dict[str, float]:
             raise ModifierRequestError(f"unknown pose unit: {unit_id}")
         values[unit_id] = _as_unit(value, unit_id)
     return values
+
+
+def _parse_include_rig(raw: Any) -> bool:
+    if raw is None:
+        return False
+    if not isinstance(raw, bool):
+        raise ModifierRequestError("include_rig must be a boolean")
+    return raw
+
+
+def _parse_pose_pair_id(raw: Any, include_rig: bool) -> str | None:
+    if raw is None:
+        return "tpose-to-rest" if include_rig else None
+    if not isinstance(raw, str) or raw.strip() == "":
+        raise ModifierRequestError("pose_pair_id must be a non-empty string")
+    pair_id = raw.strip()
+    from .pose_pairs import get_pose_pair
+
+    try:
+        get_pose_pair(pair_id)
+    except KeyError as exc:
+        raise ModifierRequestError(str(exc)) from exc
+    if not include_rig:
+        raise ModifierRequestError("pose_pair_id requires include_rig=true")
+    return pair_id

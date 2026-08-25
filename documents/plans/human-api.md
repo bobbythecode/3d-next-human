@@ -16,6 +16,7 @@ Goal: run as an **HTTP service instead of the desktop app**. Callers talk to thi
 ✅ HTTP facade lives in this repo (so it is AGPL too)
 ✅ GET /health · GET /license · POST /internal/humans/generate
    → OBJ metres Y-up · feet at Y=0 (MH “Feet on ground”)
+✅ GET /internal/humans/pose-pairs · generate `include_rig` → `human-rig.v1` (P9 Phase 1)
 ✅ Dev: `scripts/dev-up.cmd` (Windows) or `scripts/dev-up.sh` — Docker is optional
 ✅ Optional container image stays separate from other products
 

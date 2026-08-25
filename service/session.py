@@ -4,12 +4,15 @@ from __future__ import annotations
 
 from typing import Any
 
+import numpy as np
+
 from .bootstrap import ensure_runtime, qt_imported
-from .catalog import ALIAS_TO_FULLNAME
-from .mesh_export import export_basemesh
 from .body_measures import apply_body_cm
+from .catalog import ALIAS_TO_FULLNAME
+from .mesh_export import export_basemesh, write_triangle_obj
 from .modifier_request import HumanModifierRequest
 from .pose_catalog import apply_pose
+from .rig_export import export_rig
 
 _HUMAN = None
 
@@ -78,12 +81,29 @@ def generate(payload: object) -> dict[str, Any]:
         person.applyAllTargets()
     if request.body_cm:
         apply_body_cm(person, request.body_cm)
-    pose = apply_pose(person, request.pose_id, request.pose_units)
+
+    rig_payload = None
+    if request.include_rig:
+        pair_id = request.pose_pair_id or "tpose-to-rest"
+        rig_payload = export_rig(
+            person,
+            pose_pair_id=pair_id,
+            pose_units=request.pose_units,
+        )
+        # OBJ matches pair pose A and the same ground/compact as the rig.
+        pose = {"id": rig_payload["poses"]["a"]["id"], "units": {"body": {}, "face": {}}}
+        obj = write_triangle_obj(
+            np.asarray(rig_payload["poses"]["a"]["posed_positions"], dtype=np.float64),
+            [tuple(tri) for tri in rig_payload["bind"]["triangles"]],
+        )
+    else:
+        pose = apply_pose(person, request.pose_id, request.pose_units)
+        mesh = person.meshData
+        obj = export_basemesh(mesh.coord, mesh.fvert, mesh.face_mask)
+
     if qt_imported():
         raise HumanSessionError("Qt was imported during generate; headless contract broken")
-    mesh = person.meshData
-    obj = export_basemesh(mesh.coord, mesh.fvert, mesh.face_mask)
-    return {
+    result = {
         "height_cm": float(person.getHeightCm()),
         "applied": request.as_dict(),
         "pose": pose,
@@ -91,3 +111,6 @@ def generate(payload: object) -> dict[str, Any]:
         "up": "y",
         "obj": obj,
     }
+    if rig_payload is not None:
+        result["rig"] = rig_payload
+    return result

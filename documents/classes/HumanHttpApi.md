@@ -13,7 +13,9 @@ HTTP facade of the AGPL process — health / license / generate without opening 
 | GET /health | — | HTTP clients / smoke scripts |
 | GET /license | — | AGPL §13 when offered over a network |
 | GET /internal/humans/modifiers | — | HTTP clients |
-| POST /internal/humans/generate | `HumanModifierRequest` | HTTP clients |
+| GET /internal/humans/poses | — | pose pickers |
+| GET /internal/humans/pose-pairs | — | P9 transition catalog |
+| POST /internal/humans/generate | `HumanModifierRequest` (+ optional `include_rig`) | HTTP clients |
 
 ## Output
 
@@ -23,7 +25,8 @@ HTTP facade of the AGPL process — health / license / generate without opening 
 | license | `{ license, code, assets, output, files, note }` | AGPL §13 · see [`../guides/license.md`](../guides/license.md) |
 | modifiers | `{ categories }` by target group | Macro / body slider UIs |
 | poses | pose catalog | pose pickers |
-| generate | `{ height_cm, applied, unit, up, obj }` | mesh consumers |
+| pose-pairs | `{ version, rig, pairs }` | portal / Nest · [`PosePairCatalog`](./PosePairCatalog.md) |
+| generate | `{ height_cm, applied, unit, up, obj [, rig] }` | mesh consumers · [`RigExport`](./RigExport.md) |
 
 `GET /license` points at **AGPL-3.0** · source URL of this repo · assets = CC0 · output OBJ = user data (LICENSE.md section D)
 

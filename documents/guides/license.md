@@ -7,8 +7,10 @@
 | Part | License | Files |
 |------|---------|-------|
 | MakeHuman source + `service/` (human-api) | **AGPL-3.0** (or later) | `LICENSE.CODE.md` · sections B + **E** |
-| Bundled assets (basemesh / targets / …) | **CC0 1.0** | `LICENSE.ASSETS.md` · section C |
-| Generate/export output (OBJ, etc.) | **user data** | section D |
+| Bundled assets (basemesh / targets / **poses · poseunits · BVH**) | **CC0 1.0** | `LICENSE.ASSETS.md` · section C |
+| Generate/export output (OBJ, **rig JSON**, etc.) | **user data** | section D |
+
+Pose BVH / poseunits used by P9 pose-pairs are **CC0 assets** (not AGPL). Catalog entries carry `license.assets = CC0-1.0`.
 
 ## Isolation
 
