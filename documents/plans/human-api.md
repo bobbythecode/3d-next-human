@@ -19,11 +19,14 @@ Goal: run as an **HTTP service instead of the desktop app**. Callers talk to thi
 ✅ GET /internal/humans/pose-pairs · generate `include_rig` → `human-rig.v1` (P9 Phase 1)
 ✅ Dev: `scripts/dev-up.cmd` (Windows) or `scripts/dev-up.sh` — Docker is optional
 ✅ Optional container image stays separate from other products
+✅ Author custom library poses via Blender → BVH in `data/poses/` (guide below)
 
 ❌ Do not import this package into another app
 ❌ Do not copy makehuman/*.py into another repo
 ❌ Do not use a Qt window as the gate
 ```
+
+Custom poses (Blender → BVH → catalog): [`../guides/blender-pose-bvh.md`](../guides/blender-pose-bvh.md)
 
 Local smoke (Windows):
 

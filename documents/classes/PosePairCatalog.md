@@ -25,6 +25,9 @@
 
 `RigExport` ใช้ units ต่อ endpoint แยก A/B · overlay จาก request `pose_units` ทับทั้งคู่
 
+Endpoint ยังชี้ `pose.id` ไป BVH ใน `makehuman/data/poses/` ได้โดยตรง (เช่น `tpose`)  
+ออกแบบท่าใหม่ด้วย Blender: [`../guides/blender-pose-bvh.md`](../guides/blender-pose-bvh.md)
+
 ## Tests
 
 - `tests/test_pose_pairs.py`
