@@ -122,9 +122,10 @@ def export_rig(
     pose_units: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Build human-rig.v1 after morphs are applied; leaves person posed at pair A."""
-    units = dict(pose_units or {})
     pair = get_pose_pair(pose_pair_id)
-    pose_a, pose_b = pose_pair_endpoints(pair)
+    (pose_a, units_a), (pose_b, units_b) = pose_pair_endpoints(pair)
+    # Request units apply on top of both endpoints (modifier overlay).
+    overlay = dict(pose_units or {})
 
     apply_pose(person, "rest", {})
     mesh = person.meshData
@@ -148,7 +149,7 @@ def export_rig(
     joint_indices, joint_weights = _remap_influences(indices_full, weights_full, used_old)
     joints = _joint_table(skel, ground_offset_dm)
 
-    apply_pose(person, pose_a, units)
+    apply_pose(person, pose_a, {**overlay, **units_a})
     skel = person.getBaseSkeleton()
     world_a = _capture_joint_world_m(skel, ground_offset_dm)
     local_a = _capture_joint_local_m(skel, ground_offset_dm)
@@ -156,7 +157,7 @@ def export_rig(
     posed_a_dm[:, 1] -= ground_offset_dm
     posed_a_m, _ = compact_used(posed_a_dm * DM_TO_M, triangles)
 
-    apply_pose(person, pose_b, units)
+    apply_pose(person, pose_b, {**overlay, **units_b})
     skel = person.getBaseSkeleton()
     world_b = _capture_joint_world_m(skel, ground_offset_dm)
     local_b = _capture_joint_local_m(skel, ground_offset_dm)
@@ -165,7 +166,10 @@ def export_rig(
     posed_b_m, _ = compact_used(posed_b_dm * DM_TO_M, triangles)
 
     # Leave person at pose A for OBJ export in session.generate
-    apply_pose(person, pose_a, units)
+    apply_pose(person, pose_a, {**overlay, **units_a})
+
+    pose_a_label = pose_a if not units_a else f"{pose_a}+units"
+    pose_b_label = pose_b if not units_b else f"{pose_b}+units"
 
     return {
         "schema": SCHEMA,
@@ -185,13 +189,17 @@ def export_rig(
         },
         "poses": {
             "a": {
-                "id": pose_a,
+                "id": pose_a_label,
+                "library_pose": pose_a,
+                "units": units_a,
                 "world_matrices": world_a,
                 "local_matrices": local_a,
                 "posed_positions": posed_a_m.astype(np.float64).tolist(),
             },
             "b": {
-                "id": pose_b,
+                "id": pose_b_label,
+                "library_pose": pose_b,
+                "units": units_b,
                 "world_matrices": world_b,
                 "local_matrices": local_b,
                 "posed_positions": posed_b_m.astype(np.float64).tolist(),
@@ -200,6 +208,7 @@ def export_rig(
         "pose_pair": {
             "id": pair["id"],
             "version": pair["version"],
+            "name": pair.get("name"),
             "duration_s": pair["duration_s"],
             "fps": pair["fps"],
             "interpolation": pair["interpolation"],

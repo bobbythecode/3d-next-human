@@ -16,6 +16,22 @@ REST_POSE_ID = "rest"
 _BODY_POSEUNITS: dict[str, dict[str, tuple[float, float, float, float]]] | None = None
 _FACE_POSEUNIT_NAMES: list[str] | None = None
 
+# body-poseunits.json still names some bones as upperleg.L/.R; default MH
+# skeleton uses upperleg01 + upperleg02. Map the old name to the proximal bone.
+_BONE_ALIASES = {
+    "upperleg.L": "upperleg01.L",
+    "upperleg.R": "upperleg01.R",
+}
+
+
+def _resolve_bone_index(bone_index: dict[str, int], bone_name: str) -> int | None:
+    if bone_name in bone_index:
+        return bone_index[bone_name]
+    alias = _BONE_ALIASES.get(bone_name)
+    if alias is not None and alias in bone_index:
+        return bone_index[alias]
+    return None
+
 
 def _list_pose_ids() -> list[str]:
     ids = sorted(path.stem.lower() for path in POSES_DIR.glob("*.bvh"))
@@ -158,7 +174,7 @@ def _pose_data_for_units(person, unit_weights: dict[str, float]):
         if unit_id in body_defs:
             body_used[unit_id] = weight
             for bone_name, quat in body_defs[unit_id].items():
-                idx = bone_index.get(bone_name)
+                idx = _resolve_bone_index(bone_index, bone_name)
                 if idx is None:
                     continue
                 apply_weighted_quat(idx, np.asarray(quat, dtype=np.float32), weight)

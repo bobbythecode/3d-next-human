@@ -104,3 +104,74 @@ def test_include_rig_default_obj_is_pair_a():
         }
     )
     assert result["pose"]["id"] == "rest"
+
+
+@pytest.mark.integration
+def test_rest_to_left_arm_up_moves_left_wrist():
+    """MH UpperArmUpLeft* only touches face bones — pair must use real arm units."""
+    result = generate(
+        {
+            "height_cm": 170,
+            "include_rig": True,
+            "pose_pair_id": "rest-to-left-arm-up",
+            "pose": {"id": "rest"},
+        }
+    )
+    rig = result["rig"]
+    assert rig["pose_pair"]["id"] == "rest-to-left-arm-up"
+    assert "UpperArmForwardLeft" in rig["poses"]["b"]["units"]
+    names = [j["name"] for j in rig["joints"]]
+    wrist = names.index("wrist.L")
+    ta = np.asarray(rig["poses"]["a"]["world_matrices"][wrist], dtype=np.float64)[
+        :3, 3
+    ]
+    tb = np.asarray(rig["poses"]["b"]["world_matrices"][wrist], dtype=np.float64)[
+        :3, 3
+    ]
+    # metres; arm-up must lift/swing wrist by several centimetres (not ~0).
+    assert float(np.linalg.norm(tb - ta)) >= 0.15
+
+
+@pytest.mark.integration
+def test_rest_to_left_knee_bend_moves_left_shin():
+    """MH LowerLegBendLeft* miss shin bones — pair must move foot via lowerleg."""
+    result = generate(
+        {
+            "height_cm": 170,
+            "include_rig": True,
+            "pose_pair_id": "rest-to-left-knee-bend",
+            "pose": {"id": "rest"},
+        }
+    )
+    rig = result["rig"]
+    assert rig["pose_pair"]["id"] == "rest-to-left-knee-bend"
+    assert rig["pose_pair"]["version"] == "2"
+    assert "FootTurnOutLeft" in rig["poses"]["b"]["units"]
+    assert "LowerLegBendLeft1" not in rig["poses"]["b"]["units"]
+    names = [j["name"] for j in rig["joints"]]
+    shin = names.index("lowerleg01.L")
+    foot = names.index("foot.L")
+    thigh = names.index("upperleg01.L")
+    ra = np.asarray(rig["poses"]["a"]["world_matrices"][shin], dtype=np.float64)[
+        :3, :3
+    ]
+    rb = np.asarray(rig["poses"]["b"]["world_matrices"][shin], dtype=np.float64)[
+        :3, :3
+    ]
+    fa = np.asarray(rig["poses"]["a"]["world_matrices"][foot], dtype=np.float64)[
+        :3, 3
+    ]
+    fb = np.asarray(rig["poses"]["b"]["world_matrices"][foot], dtype=np.float64)[
+        :3, 3
+    ]
+    tha = np.asarray(rig["poses"]["a"]["world_matrices"][thigh], dtype=np.float64)[
+        :3, :3
+    ]
+    thb = np.asarray(rig["poses"]["b"]["world_matrices"][thigh], dtype=np.float64)[
+        :3, :3
+    ]
+    assert float(np.linalg.norm(rb - ra)) >= 0.3
+    assert float(np.linalg.norm(fb - fa)) >= 0.15
+    # upperleg.L alias → upperleg01.L so thigh rotates (joint origin stays)
+    assert float(np.linalg.norm(thb - tha)) >= 0.2
+
