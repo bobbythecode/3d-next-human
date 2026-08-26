@@ -34,6 +34,7 @@ def test_generate_include_rig_lbs_matches_pose_a_and_b():
             "gender": 0.5,
             "include_rig": True,
             "pose_pair_id": "tpose-to-rest",
+            "pose": {"id": "tpose"},
         }
     )
     assert "rig" in result
@@ -70,4 +71,36 @@ def test_generate_include_rig_lbs_matches_pose_a_and_b():
 def test_generate_without_include_rig_omits_rig():
     result = generate({"pose": {"id": "rest"}})
     assert "rig" not in result
+    assert result["pose"]["id"] == "rest"
+
+
+@pytest.mark.integration
+def test_include_rig_obj_follows_requested_pose_endpoint():
+    """Portal sends rest-to-tpose + pose tpose — OBJ must be T, not rest (pair A)."""
+    result = generate(
+        {
+            "height_cm": 170,
+            "include_rig": True,
+            "pose_pair_id": "rest-to-tpose",
+            "pose": {"id": "tpose"},
+        }
+    )
+    assert result["pose"]["id"] == "tpose"
+    posed_b = result["rig"]["poses"]["b"]["posed_positions"]
+    # OBJ vertices are metres; compare a sample of positions to pose B.
+    lines = [ln for ln in result["obj"].splitlines() if ln.startswith("v ")]
+    assert len(lines) == len(posed_b)
+    first = [float(x) for x in lines[0].split()[1:4]]
+    assert first == pytest.approx(posed_b[0], abs=1e-6)
+
+
+@pytest.mark.integration
+def test_include_rig_default_obj_is_pair_a():
+    result = generate(
+        {
+            "height_cm": 170,
+            "include_rig": True,
+            "pose_pair_id": "rest-to-tpose",
+        }
+    )
     assert result["pose"]["id"] == "rest"

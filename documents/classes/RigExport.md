@@ -21,6 +21,8 @@
 |------|---------|
 | `rig` | ใน `POST /internal/humans/generate` เมื่อ `include_rig=true` |
 
+เมื่อ `include_rig` + `pose.id` ชี้ท่า A หรือ B ของคู่ — OBJ ใช้ตำแหน่งท่านั้น (ไม่บังคับแค่ A)
+
 ## ไม่ทำ
 
 - ไม่เขียน glTF ในคลื่นแรก

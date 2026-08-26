@@ -90,10 +90,16 @@ def generate(payload: object) -> dict[str, Any]:
             pose_pair_id=pair_id,
             pose_units=request.pose_units,
         )
-        # OBJ matches pair pose A and the same ground/compact as the rig.
-        pose = {"id": rig_payload["poses"]["a"]["id"], "units": {"body": {}, "face": {}}}
+        # OBJ must stay on the compact rig mesh; pick A or B from the pair.
+        pose_key = "a"
+        if request.pose_id == rig_payload["poses"]["b"]["id"]:
+            pose_key = "b"
+        elif request.pose_id == rig_payload["poses"]["a"]["id"]:
+            pose_key = "a"
+        chosen = rig_payload["poses"][pose_key]
+        pose = {"id": chosen["id"], "units": {"body": {}, "face": {}}}
         obj = write_triangle_obj(
-            np.asarray(rig_payload["poses"]["a"]["posed_positions"], dtype=np.float64),
+            np.asarray(chosen["posed_positions"], dtype=np.float64),
             [tuple(tri) for tri in rig_payload["bind"]["triangles"]],
         )
     else:
