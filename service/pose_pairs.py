@@ -170,3 +170,21 @@ def pose_pair_endpoints(
         if unit_id not in known_units:
             raise KeyError(f"pose pair unit unknown: {unit_id}")
     return (a_id, a_units), (b_id, b_units)
+
+
+def main(argv: list[str] | None = None) -> int:
+    import json
+    import sys
+
+    args = list(sys.argv[1:] if argv is None else argv)
+    try:
+        payload = get_pose_pair(args[0]) if args else pose_pairs_payload()
+    except KeyError as err:
+        print(str(err), file=sys.stderr)
+        return 1
+    print(json.dumps(payload, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

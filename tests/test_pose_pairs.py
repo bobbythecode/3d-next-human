@@ -1,4 +1,4 @@
-from service.pose_pairs import get_pose_pair, pose_pair_endpoints, pose_pairs_payload
+from service.pose_pairs import get_pose_pair, main, pose_pair_endpoints, pose_pairs_payload
 
 
 def test_pose_pairs_catalog_has_golden_tpose_to_rest():
@@ -52,3 +52,26 @@ def test_unknown_pose_pair_raises():
         assert False, "expected KeyError"
     except KeyError as err:
         assert "unknown pose_pair_id" in str(err)
+
+
+def test_main_dumps_catalog_and_pair():
+    import io
+    import json
+    from contextlib import redirect_stdout
+
+    catalog_buf = io.StringIO()
+    with redirect_stdout(catalog_buf):
+        assert main([]) == 0
+    catalog = json.loads(catalog_buf.getvalue())
+    assert catalog["version"] == "pose-pairs.v1"
+    ids = [item["id"] for item in catalog["pairs"]]
+    assert "rest-to-kick" in ids
+
+    pair_buf = io.StringIO()
+    with redirect_stdout(pair_buf):
+        assert main(["rest-to-kick"]) == 0
+    pair = json.loads(pair_buf.getvalue())
+    assert pair["id"] == "rest-to-kick"
+    assert pair["b"]["pose"]["id"] == "kick"
+
+    assert main(["not-a-pair"]) == 1

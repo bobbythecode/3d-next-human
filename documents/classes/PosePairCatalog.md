@@ -33,6 +33,8 @@ Endpoint ยังชี้ `pose.id` ไป BVH ใน `makehuman/data/poses/` 
 **Authoring loop (ท่าใหม่ใดก็ได้):** MH desktop export → Blender pose → BVH → preview ใน MH Pose Library → promote → (optional) เพิ่มคู่ใน catalog  
 คู่มือ: [`../guides/blender-pose-bvh.md`](../guides/blender-pose-bvh.md)
 
+Dump catalog (repo root): `scripts\pose-pairs.cmd` · one pair: `scripts\pose-pairs.cmd rest-to-kick`
+
 ## Tests
 
 - `tests/test_pose_pairs.py`
