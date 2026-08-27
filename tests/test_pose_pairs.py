@@ -11,6 +11,7 @@ def test_pose_pairs_catalog_has_golden_tpose_to_rest():
     assert "rest-to-left-arm-up" in ids
     assert "rest-to-torso-lean" in ids
     assert "rest-to-left-knee-bend" in ids
+    assert "rest-to-kick" in ids
     pair = get_pose_pair("tpose-to-rest")
     assert pair["a"]["pose"]["id"] == "tpose"
     assert pair["b"]["pose"]["id"] == "rest"

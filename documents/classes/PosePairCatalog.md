@@ -22,6 +22,7 @@
 | `rest-to-left-arm-up` | rest → rest + UpperArmForwardLeft + UpperArmRollOutLeft |
 | `rest-to-torso-lean` | rest → rest + TorsoLeft |
 | `rest-to-left-knee-bend` | rest → rest + UpperLegForwardLeft + FootTurnOutLeft (v2) · alias `upperleg.L`→`upperleg01.L` |
+| `rest-to-kick` | rest → kick (BVH) |
 
 `RigExport` ใช้ units ต่อ endpoint แยก A/B · overlay จาก request `pose_units` ทับทั้งคู่
 

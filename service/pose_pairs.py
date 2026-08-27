@@ -113,6 +113,21 @@ _PAIRS: tuple[dict[str, Any], ...] = (
             "note": "bundled MakeHuman poses / poseunits (LICENSE.md §C)",
         },
     },
+    {
+        "id": "rest-to-kick",
+        "name": "rest → kick",
+        "version": "1",
+        "a": {"pose": {"id": REST_POSE_ID}},
+        "b": {"pose": {"id": "kick"}},
+        "duration_s": 1.0,
+        "fps": 30,
+        "interpolation": "joint_local_slerp",
+        "root_policy": "lock_feet",
+        "license": {
+            "assets": "CC0-1.0",
+            "note": "author BVH in makehuman/data/poses/",
+        },
+    },
 )
 
 
