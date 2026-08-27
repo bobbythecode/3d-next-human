@@ -115,18 +115,8 @@ def _joint_table(skel, ground_offset_dm: float) -> list[dict[str, Any]]:
     return joints
 
 
-def export_rig(
-    person,
-    *,
-    pose_pair_id: str,
-    pose_units: dict[str, float] | None = None,
-) -> dict[str, Any]:
-    """Build human-rig.v1 after morphs are applied; leaves person posed at pair A."""
-    pair = get_pose_pair(pose_pair_id)
-    (pose_a, units_a), (pose_b, units_b) = pose_pair_endpoints(pair)
-    # Request units apply on top of both endpoints (modifier overlay).
-    overlay = dict(pose_units or {})
-
+def build_bind_shell(person) -> dict[str, Any]:
+    """Rest bind + influences for the current morph — reusable across pose pairs."""
     apply_pose(person, "rest", {})
     mesh = person.meshData
     skel = person.getBaseSkeleton()
@@ -149,6 +139,40 @@ def export_rig(
     joint_indices, joint_weights = _remap_influences(indices_full, weights_full, used_old)
     joints = _joint_table(skel, ground_offset_dm)
 
+    return {
+        "triangles": triangles,
+        "used_old": used_old,
+        "ground_offset_dm": ground_offset_dm,
+        "joints": joints,
+        "joint_indices": joint_indices,
+        "joint_weights": joint_weights,
+        "coords_m": coords_m,
+        "compact_tris": compact_tris,
+    }
+
+
+def export_rig(
+    person,
+    *,
+    pose_pair_id: str,
+    pose_units: dict[str, float] | None = None,
+    bind_shell: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build human-rig.v1 after morphs are applied.
+
+    When ``bind_shell`` is provided (same body shape), skip rest/bind rebuild and
+    only sample pose A/B. OBJ/export callers use ``posed_positions`` — person may
+    be left at pose B.
+    """
+    pair = get_pose_pair(pose_pair_id)
+    (pose_a, units_a), (pose_b, units_b) = pose_pair_endpoints(pair)
+    overlay = dict(pose_units or {})
+
+    shell = bind_shell if bind_shell is not None else build_bind_shell(person)
+    triangles = shell["triangles"]
+    ground_offset_dm = float(shell["ground_offset_dm"])
+    mesh = person.meshData
+
     apply_pose(person, pose_a, {**overlay, **units_a})
     skel = person.getBaseSkeleton()
     world_a = _capture_joint_world_m(skel, ground_offset_dm)
@@ -165,27 +189,25 @@ def export_rig(
     posed_b_dm[:, 1] -= ground_offset_dm
     posed_b_m, _ = compact_used(posed_b_dm * DM_TO_M, triangles)
 
-    # Leave person at pose A for OBJ export in session.generate
-    apply_pose(person, pose_a, {**overlay, **units_a})
-
     pose_a_label = pose_a if not units_a else f"{pose_a}+units"
     pose_b_label = pose_b if not units_b else f"{pose_b}+units"
+    coords_m = np.asarray(shell["coords_m"], dtype=np.float64)
 
     return {
         "schema": SCHEMA,
         "rig_id": RIG_ID,
         "rig_version": RIG_VERSION,
-        "joints": joints,
+        "joints": shell["joints"],
         "influences": {
             "max": MAX_INFLUENCES,
-            "joint_indices": joint_indices,
-            "weights": joint_weights,
+            "joint_indices": shell["joint_indices"],
+            "weights": shell["joint_weights"],
             "vertex_count": int(coords_m.shape[0]),
-            "vertex_map": used_old,
+            "vertex_map": shell["used_old"],
         },
         "bind": {
             "rest_positions": coords_m.astype(np.float64).tolist(),
-            "triangles": [list(tri) for tri in compact_tris],
+            "triangles": [list(tri) for tri in shell["compact_tris"]],
         },
         "poses": {
             "a": {
@@ -221,4 +243,5 @@ def export_rig(
             "orientation": MESH_ORIENTATION,
         },
         "license": pair.get("license"),
+        "_bind_shell": shell,
     }

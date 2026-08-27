@@ -15,6 +15,12 @@ from .pose_catalog import apply_pose
 from .rig_export import export_rig
 
 _HUMAN = None
+# Last applied body-shape signature — skip remesh when only pose_pair changes.
+_SHAPE_SIG: tuple[Any, ...] | None = None
+# Rest bind + influences for current shape (reused across pose pairs).
+_BIND_SHELL: dict[str, Any] | None = None
+# Full generate payloads keyed by (shape_sig, pose_pair_id, pose_units, pose_id).
+_GENERATE_CACHE: dict[tuple[Any, ...], dict[str, Any]] = {}
 
 MODIFIER_FILES = (
     "modifiers/modeling_modifiers.json",
@@ -65,31 +71,73 @@ def _set_height_cm(person, target_cm: float) -> None:
             hi = mid
 
 
+def _shape_signature(request: HumanModifierRequest) -> tuple[Any, ...]:
+    mods = tuple(sorted(request.modifier_values().items()))
+    body = tuple(sorted((request.body_cm or {}).items()))
+    height = None if request.height_cm is None else round(float(request.height_cm), 4)
+    return (height, mods, body)
+
+
+def _pose_units_key(pose_units: dict[str, float] | None) -> tuple[tuple[str, float], ...]:
+    if not pose_units:
+        return ()
+    return tuple(sorted((str(k), round(float(v), 6)) for k, v in pose_units.items()))
+
+
+def _cache_key(request: HumanModifierRequest, sig: tuple[Any, ...]) -> tuple[Any, ...]:
+    pair = request.pose_pair_id or ""
+    pose_id = request.pose_id or ""
+    return (
+        sig,
+        bool(request.include_rig),
+        pair if request.include_rig else "",
+        _pose_units_key(request.pose_units),
+        pose_id,
+    )
+
+
 def generate(payload: object) -> dict[str, Any]:
+    global _SHAPE_SIG, _BIND_SHELL
     request = (
         payload
         if isinstance(payload, HumanModifierRequest)
         else HumanModifierRequest.parse(payload)
     )
     person = _load_human()
-    person.resetMeshValues()
-    for full_name, value in request.modifier_values().items():
-        person.getModifier(full_name).setValue(value)
-    if request.height_cm is not None:
-        _set_height_cm(person, request.height_cm)
-    else:
-        person.applyAllTargets()
-    if request.body_cm:
-        apply_body_cm(person, request.body_cm)
+    sig = _shape_signature(request)
+    key = _cache_key(request, sig)
+    cached = _GENERATE_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    if _SHAPE_SIG != sig:
+        person.resetMeshValues()
+        for full_name, value in request.modifier_values().items():
+            person.getModifier(full_name).setValue(value)
+        if request.height_cm is not None:
+            _set_height_cm(person, request.height_cm)
+        else:
+            person.applyAllTargets()
+        if request.body_cm:
+            apply_body_cm(person, request.body_cm)
+        _SHAPE_SIG = sig
+        _BIND_SHELL = None
+        # Drop generate cache entries for other shapes to bound memory.
+        stale = [k for k in _GENERATE_CACHE if k[0] != sig]
+        for k in stale:
+            del _GENERATE_CACHE[k]
 
     rig_payload = None
     if request.include_rig:
         pair_id = request.pose_pair_id or "tpose-to-rest"
-        rig_payload = export_rig(
+        rig_raw = export_rig(
             person,
             pose_pair_id=pair_id,
             pose_units=request.pose_units,
+            bind_shell=_BIND_SHELL,
         )
+        _BIND_SHELL = rig_raw.pop("_bind_shell")
+        rig_payload = rig_raw
         # OBJ must stay on the compact rig mesh; pick A or B from the pair.
         pose_key = "a"
         if request.pose_id == rig_payload["poses"]["b"]["id"]:
@@ -119,4 +167,5 @@ def generate(payload: object) -> dict[str, Any]:
     }
     if rig_payload is not None:
         result["rig"] = rig_payload
+    _GENERATE_CACHE[key] = result
     return result

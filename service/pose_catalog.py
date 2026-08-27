@@ -95,9 +95,13 @@ def pose_catalog_payload() -> dict[str, Any]:
     return {"library": library, "units": units}
 
 
-def _load_bvh_animation(person, pose_id: str):
-    if pose_id == REST_POSE_ID:
-        return None
+_BVH_FILE_CACHE: dict[str, Any] = {}
+
+
+def _load_bvh_file(pose_id: str):
+    cached = _BVH_FILE_CACHE.get(pose_id)
+    if cached is not None:
+        return cached
     import bvh
     from getpath import getSysDataPath
 
@@ -105,6 +109,14 @@ def _load_bvh_animation(person, pose_id: str):
     bvh_file = bvh.load(filepath, convertFromZUp="auto")
     if COMPARE_BONE not in bvh_file.joints:
         raise RuntimeError(f"pose {pose_id} does not use the default MakeHuman rig")
+    _BVH_FILE_CACHE[pose_id] = bvh_file
+    return bvh_file
+
+
+def _load_bvh_animation(person, pose_id: str):
+    if pose_id == REST_POSE_ID:
+        return None
+    bvh_file = _load_bvh_file(pose_id)
     anim = bvh_file.createAnimationTrack(person.getBaseSkeleton(), name=f"pose-{pose_id}")
     _autoscale_bvh_root_translation(person, bvh_file, anim)
     return anim
