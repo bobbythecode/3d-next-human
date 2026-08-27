@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from typing import Any
 
 import numpy as np
@@ -21,6 +22,8 @@ _SHAPE_SIG: tuple[Any, ...] | None = None
 _BIND_SHELL: dict[str, Any] | None = None
 # Full generate payloads keyed by (shape_sig, pose_pair_id, pose_units, pose_id).
 _GENERATE_CACHE: dict[tuple[Any, ...], dict[str, Any]] = {}
+# ThreadingHTTPServer accepts concurrent POSTs; MakeHuman + globals are not re-entrant.
+_GENERATE_LOCK = threading.Lock()
 
 MODIFIER_FILES = (
     "modifiers/modeling_modifiers.json",
@@ -97,6 +100,11 @@ def _cache_key(request: HumanModifierRequest, sig: tuple[Any, ...]) -> tuple[Any
 
 
 def generate(payload: object) -> dict[str, Any]:
+    with _GENERATE_LOCK:
+        return _generate_locked(payload)
+
+
+def _generate_locked(payload: object) -> dict[str, Any]:
     global _SHAPE_SIG, _BIND_SHELL
     request = (
         payload
