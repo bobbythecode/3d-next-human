@@ -13,6 +13,8 @@ Callers use REST only — do not import or COPY this source into another product
 
 Supported: generate OBJ in metres, Y-up · feet at Y=0 · Macro / Head–Feet / Pose modifiers via `GET /internal/humans/modifiers` and `POST /internal/humans/generate`.
 
+**Custom poses (Blender round-trip):** [`documents/guides/blender-pose-bvh.md`](documents/guides/blender-pose-bvh.md) · validate: `scripts/validate-pose-bvh.cmd` · fix Blender root bake: `scripts/fix_blender_pose_bvh.py` · first proof: `kick` / `rest-to-kick` ([action log](documents/action-logs/2026-08-27-blender-pose-roundtrip.md)).
+
 Environment: conda env `human` · Python 3.9 · numpy 1.x (do not use the machine’s Python 3.13)
 
 ```text

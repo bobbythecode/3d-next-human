@@ -27,6 +27,8 @@ Logic เดียวกับ MH desktop Pose Library
 
 **Blender path ในรอบนี้:** FBX/Collada manual import (ไม่ใช้ community MakeHuman Blender plugin).
 
+**Proven example (2026-08-27):** `kick` — Blender BVH → `fix_blender_pose_bvh.py` → MH preview → `makehuman/data/poses/kick.bvh` → `rest-to-kick` → portal drape. See [`../action-logs/2026-08-27-blender-pose-roundtrip.md`](../action-logs/2026-08-27-blender-pose-roundtrip.md).
+
 ## Hard rules
 
 ```text
@@ -135,7 +137,7 @@ After MH preview passes, copy into the repo tree:
 | `makehuman/data/poses/<id>.bvh` | Motion (required) |
 | `makehuman/data/poses/<id>.meta` | Name / license (recommended) |
 
-`<id>` is lowercase stem used as `pose.id` (example: `wave` → `wave.bvh`).
+`<id>` is lowercase stem used as `pose.id` (example: `kick` → `kick.bvh` · proven 2026-08-27).
 
 `.meta` shape (see `tpose.meta`):
 
@@ -198,10 +200,11 @@ Do not reuse an old drape on a new body
 | Export rig+mesh | MH desktop → FBX/Collada | Blender authoring |
 | Pose | Blender | Rotate bones only |
 | Export motion | Blender → BVH | Pose file |
+| Fix root bake | `scripts/fix_blender_pose_bvh.py` | Blender ~90° root → MH-native BVH |
 | Validate | `scripts/validate_pose_bvh.py` | Gate before MH load |
 | Preview | MH user `data/poses/` | Approve pose on mannequin |
 | Promote | `makehuman/data/poses/` | human-api library scan |
-| Product | `pose_pairs.py` + portal | A→B transition |
+| Product | `pose_pairs.py` + portal | A→B transition · example: `rest-to-kick` |
 
 ## Later
 

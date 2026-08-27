@@ -16,10 +16,10 @@ Goal: run as an **HTTP service instead of the desktop app**. Callers talk to thi
 ✅ HTTP facade lives in this repo (so it is AGPL too)
 ✅ GET /health · GET /license · POST /internal/humans/generate
    → OBJ metres Y-up · feet at Y=0 (MH “Feet on ground”)
-✅ GET /internal/humans/pose-pairs · generate `include_rig` → `human-rig.v1` (P9 Phase 1)
+✅ GET /internal/humans/pose-pairs · generate `include_rig` → `human-rig.v1` (P9 Phase 1 · 6 golden pairs incl. `rest-to-kick`)
 ✅ Dev: `scripts/dev-up.cmd` (Windows) or `scripts/dev-up.sh` — Docker is optional
 ✅ Optional container image stays separate from other products
-✅ Author custom library poses: MH desktop → Blender → BVH → MH preview → `data/poses/` (guide below)
+✅ Author custom library poses: MH desktop → Blender → BVH → fix → MH preview → `data/poses/` (guide below · **kick** proven 2026-08-27)
 
 ❌ Do not import this package into another app
 ❌ Do not copy makehuman/*.py into another repo

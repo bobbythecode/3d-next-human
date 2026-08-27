@@ -15,6 +15,8 @@
 
 ## Golden pairs (Wave 1)
 
+Wave 1 มี **6** คู่ — คู่แรกที่ endpoint B เป็น **full BVH** จาก Blender: `rest-to-kick`.
+
 | id | A → B |
 |----|-------|
 | `tpose-to-rest` | tpose → rest |
@@ -22,7 +24,7 @@
 | `rest-to-left-arm-up` | rest → rest + UpperArmForwardLeft + UpperArmRollOutLeft |
 | `rest-to-torso-lean` | rest → rest + TorsoLeft |
 | `rest-to-left-knee-bend` | rest → rest + UpperLegForwardLeft + FootTurnOutLeft (v2) · alias `upperleg.L`→`upperleg01.L` |
-| `rest-to-kick` | rest → kick (BVH) |
+| `rest-to-kick` | rest → **kick** (Blender-authored BVH · [`../action-logs/2026-08-27-blender-pose-roundtrip.md`](../action-logs/2026-08-27-blender-pose-roundtrip.md)) |
 
 `RigExport` ใช้ units ต่อ endpoint แยก A/B · overlay จาก request `pose_units` ทับทั้งคู่
 

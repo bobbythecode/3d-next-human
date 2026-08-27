@@ -1,80 +1,55 @@
-# 2026-08-27 — Blender pose round-trip tooling
+# 2026-08-27 — Blender pose round-trip (kick proof)
 
-Pipeline: MH desktop → Blender (FBX/Collada) → BVH → MH preview → promote → human-api / portal  
+Pipeline: MH desktop → Blender (FBX/Collada) → BVH → fix → MH preview → promote → human-api / portal  
 Guide: [`../guides/blender-pose-bvh.md`](../guides/blender-pose-bvh.md)
 
 ## Done (repo)
 
-- [`scripts/validate_pose_bvh.py`](../../scripts/validate_pose_bvh.py) — CLI gate
-- [`service/pose_bvh_validate.py`](../../service/pose_bvh_validate.py) — shared validation (mirrors `_load_bvh_animation`)
-- [`tests/test_validate_pose_bvh.py`](../../tests/test_validate_pose_bvh.py) — tpose regression + wrong-rig fail
-
-```bat
-conda run -n human python -m pytest tests/test_validate_pose_bvh.py -q
-```
-
-Validate (PowerShell):
+| Piece | Path |
+|-------|------|
+| Validate CLI | [`scripts/validate_pose_bvh.py`](../../scripts/validate_pose_bvh.py) · [`scripts/validate-pose-bvh.cmd`](../../scripts/validate-pose-bvh.cmd) |
+| Blender root fix | [`scripts/fix_blender_pose_bvh.py`](../../scripts/fix_blender_pose_bvh.py) |
+| Validation core | [`service/pose_bvh_validate.py`](../../service/pose_bvh_validate.py) |
+| Tests | [`tests/test_validate_pose_bvh.py`](../../tests/test_validate_pose_bvh.py) |
+| Pose pair | `rest-to-kick` in [`service/pose_pairs.py`](../../service/pose_pairs.py) |
+| Catalog doc | [`PosePairCatalog.md`](../classes/PosePairCatalog.md) |
 
 ```powershell
-conda run -n human python scripts/validate_pose_bvh.py makehuman/data/poses/tpose.bvh
+conda run -n human python -m pytest tests/test_validate_pose_bvh.py tests/test_pose_pairs.py -q
+conda run -n human python scripts/validate_pose_bvh.py makehuman/data/poses/kick.bvh
+# หรือ
+.\scripts\validate-pose-bvh.cmd makehuman\data\poses\kick.bvh
 ```
 
-Validate (cmd):
+## First custom pose — `kick` (2026-08-27)
 
-```bat
-scripts\validate-pose-bvh.cmd makehuman\data\poses\tpose.bvh
-```
-
-## Manual gate — MH import preview (§5)
-
-Use after validate pass, **before** promoting to `makehuman/data/poses/`.
-
-1. Copy `<id>.bvh` (+ optional `<id>.meta`) into MH **user** poses folder (`getDataPath('poses')` — Settings → Files).
-2. MakeHuman desktop → **Pose** tab → select the BVH.
-3. Confirm pose on mannequin matches Blender intent (no flip, no collapsed limbs).
-4. If wrong → re-export from Blender → validate again → repeat.
-
-**Proof row (fill when first custom pose lands):**
-
-| Field | Value |
-|-------|-------|
-| `<id>` | _pending_ |
-| validate | _pending_ |
-| MH preview OK | _pending_ |
-
-## Manual gate — Promote template (§6–7)
-
-After MH preview passes:
-
-| Step | Action |
+| Gate | Result |
 |------|--------|
-| 1 | `validate_pose_bvh.py` on final BVH |
-| 2 | Copy to `makehuman/data/poses/<id>.bvh` + `<id>.meta` |
-| 3 | Restart human-api (`scripts/dev-up.cmd`) |
-| 4 | `GET /internal/humans/poses` → `<id>` listed |
-| 5 | (Optional) Add pair in `service/pose_pairs.py` — template in guide §7 |
-| 6 | `GET /internal/humans/pose-pairs` → pair listed (if step 5) |
+| `<id>` | `kick` |
+| Blender export | FBX/Collada round-trip → BVH (Blender vanilla export; root axis bake) |
+| `fix_blender_pose_bvh.py` | Applied before promote (root Rx=0 · zero axis/face bake) |
+| validate | ✅ `ok: kick.bvh` |
+| MH Pose Library preview | ✅ upright kick on default rig |
+| promote | ✅ `makehuman/data/poses/kick.bvh` + `kick.meta` |
+| `GET /internal/humans/poses` | ✅ includes `kick` (after human-api restart) |
+| `rest-to-kick` | ✅ in `pose_pairs` |
+| Portal | ✅ create mannequin → drape → kick pose on body (ผ้า drape บนท่า kick) |
 
-**`.meta` template:** see `makehuman/data/poses/tpose.meta` and guide §6.
+**Notes**
 
-## Manual gate — Portal smoke (§8)
+- Blender BVH export จาก MH rig มัก bake ~90° บน root — ใช้ `fix_blender_pose_bvh.py` ก่อน MH preview (see guide §3).
+- `kick.meta` ควรแก้ `name` / `description` / `copyright` ให้ตรงผู้ author (ตอนนี้ยัง clone จาก tpose template ได้).
+- Assets (`*.bvh`, `*.meta`) gitignored — อยู่ local เหมือน `tpose.bvh`.
 
-Requires step 5 (pose-pair) for A→B play.
+## Reuse checklist (ท่าถัดไป)
 
-1. Portal editor → MakeHuman panel → select `rest-to-<id>` (or existing pair).
-2. **Create mannequin** (`include_rig: true`).
-3. Drape at endpoint A.
-4. Play A→B — check limbs + cloth.
-5. Change pair or height → create mannequin again → re-drape (do not reuse old body).
-
-**Proof row:**
-
-| Field | Value |
-|-------|-------|
-| pair id | _pending_ |
-| drape + play OK | _pending_ |
+1. MH export default rig → Blender pose → export BVH
+2. `fix_blender_pose_bvh.py` → `validate_pose_bvh.py`
+3. MH user `data/poses/` preview
+4. promote `makehuman/data/poses/<id>.bvh` + `.meta`
+5. restart human-api
+6. (optional) `pose_pairs.py` entry → portal smoke
 
 ## Status
 
-Automated gate: **green** (validate script + pytest).  
-First custom authored pose + portal proof: **pending** (manual Blender/MH session).
+**green** — automated gates + first Blender-authored full-BVH pose (`kick`) proven end-to-end through portal drape.

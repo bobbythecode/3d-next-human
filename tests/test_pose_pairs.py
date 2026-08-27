@@ -39,6 +39,13 @@ def test_left_knee_bend_uses_shin_units():
     assert "LowerLegBendLeft1" not in b_units
 
 
+def test_rest_to_kick_uses_library_bvh():
+    pair = get_pose_pair("rest-to-kick")
+    (a_id, a_units), (b_id, b_units) = pose_pair_endpoints(pair)
+    assert a_id == "rest" and a_units == {}
+    assert b_id == "kick" and b_units == {}
+
+
 def test_unknown_pose_pair_raises():
     try:
         get_pose_pair("not-a-pair")
