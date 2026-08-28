@@ -71,7 +71,7 @@ _PAIRS: tuple[dict[str, Any], ...] = (
     {
         "id": "rest-to-torso-lean",
         "name": "rest → torso lean",
-        "version": "1",
+        "version": "2",
         "a": {"pose": {"id": REST_POSE_ID}},
         "b": {
             "pose": {

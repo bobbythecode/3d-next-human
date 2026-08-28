@@ -18,9 +18,14 @@ _FACE_POSEUNIT_NAMES: list[str] | None = None
 
 # body-poseunits.json still names some bones as upperleg.L/.R; default MH
 # skeleton uses upperleg01 + upperleg02. Map the old name to the proximal bone.
+# Torso* units use spine1–spine4; default rig uses spine01–spine04 (+ spine05 pelvis).
 _BONE_ALIASES = {
     "upperleg.L": "upperleg01.L",
     "upperleg.R": "upperleg01.R",
+    "spine1": "spine01",
+    "spine2": "spine02",
+    "spine3": "spine03",
+    "spine4": "spine04",
 }
 
 

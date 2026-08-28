@@ -133,6 +133,32 @@ def test_rest_to_left_arm_up_moves_left_wrist():
 
 
 @pytest.mark.integration
+def test_rest_to_torso_lean_moves_spine_and_head():
+    """body-poseunits TorsoLeft targets spine1–4 — must alias to spine01–04."""
+    result = generate(
+        {
+            "height_cm": 170,
+            "include_rig": True,
+            "pose_pair_id": "rest-to-torso-lean",
+            "pose": {"id": "rest"},
+        }
+    )
+    rig = result["rig"]
+    assert rig["pose_pair"]["id"] == "rest-to-torso-lean"
+    assert rig["pose_pair"]["version"] == "2"
+    assert rig["poses"]["b"]["units"].get("TorsoLeft") == pytest.approx(0.9)
+    names = [j["name"] for j in rig["joints"]]
+    head = names.index("head")
+    spine01 = names.index("spine01")
+    ha = np.asarray(rig["poses"]["a"]["world_matrices"][head], dtype=np.float64)[:3, 3]
+    hb = np.asarray(rig["poses"]["b"]["world_matrices"][head], dtype=np.float64)[:3, 3]
+    sa = np.asarray(rig["poses"]["a"]["world_matrices"][spine01], dtype=np.float64)[:3, 3]
+    sb = np.asarray(rig["poses"]["b"]["world_matrices"][spine01], dtype=np.float64)[:3, 3]
+    assert float(np.linalg.norm(hb - ha)) >= 0.15
+    assert float(np.linalg.norm(sb - sa)) >= 0.05
+
+
+@pytest.mark.integration
 def test_rest_to_left_knee_bend_moves_left_shin():
     """MH LowerLegBendLeft* miss shin bones — pair must move foot via lowerleg."""
     result = generate(

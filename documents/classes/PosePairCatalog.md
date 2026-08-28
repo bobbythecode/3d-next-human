@@ -22,7 +22,7 @@ Wave 1 มี **6** คู่ — คู่แรกที่ endpoint B เป�
 | `tpose-to-rest` | tpose → rest |
 | `rest-to-tpose` | rest → tpose |
 | `rest-to-left-arm-up` | rest → rest + UpperArmForwardLeft + UpperArmRollOutLeft |
-| `rest-to-torso-lean` | rest → rest + TorsoLeft |
+| `rest-to-torso-lean` | rest → rest + TorsoLeft (v2 · spine1–4→spine01–04 alias) |
 | `rest-to-left-knee-bend` | rest → rest + UpperLegForwardLeft + FootTurnOutLeft (v2) · alias `upperleg.L`→`upperleg01.L` |
 | `rest-to-kick` | rest → **kick** (Blender-authored BVH · [`../action-logs/2026-08-27-blender-pose-roundtrip.md`](../action-logs/2026-08-27-blender-pose-roundtrip.md)) |
 
