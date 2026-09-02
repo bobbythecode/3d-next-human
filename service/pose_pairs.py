@@ -130,12 +130,19 @@ _PAIRS: tuple[dict[str, Any], ...] = (
     },
 )
 
+# Hidden from GET catalog / portal dialog — still resolvable via get_pose_pair.
+_CATALOG_HIDDEN_IDS = frozenset({"tpose-to-rest"})
+
 
 def pose_pairs_payload() -> dict[str, Any]:
     return {
         "version": CATALOG_VERSION,
         "rig": {"id": RIG_ID, "version": RIG_VERSION},
-        "pairs": [dict(item) for item in _PAIRS],
+        "pairs": [
+            dict(item)
+            for item in _PAIRS
+            if item["id"] not in _CATALOG_HIDDEN_IDS
+        ],
     }
 
 

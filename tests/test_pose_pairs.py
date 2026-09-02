@@ -1,17 +1,18 @@
 from service.pose_pairs import get_pose_pair, main, pose_pair_endpoints, pose_pairs_payload
 
 
-def test_pose_pairs_catalog_has_golden_tpose_to_rest():
+def test_pose_pairs_catalog_lists_visible_pairs():
     payload = pose_pairs_payload()
     assert payload["version"] == "pose-pairs.v1"
     assert payload["rig"]["id"] == "mh-default"
     ids = [item["id"] for item in payload["pairs"]]
-    assert "tpose-to-rest" in ids
+    assert "tpose-to-rest" not in ids
     assert "rest-to-tpose" in ids
     assert "rest-to-left-arm-up" in ids
     assert "rest-to-torso-lean" in ids
     assert "rest-to-left-knee-bend" in ids
     assert "rest-to-kick" in ids
+    # Still resolvable for include_rig defaults / existing sessions.
     pair = get_pose_pair("tpose-to-rest")
     assert pair["a"]["pose"]["id"] == "tpose"
     assert pair["b"]["pose"]["id"] == "rest"
