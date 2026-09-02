@@ -6,13 +6,12 @@ def test_pose_pairs_catalog_lists_visible_pairs():
     assert payload["version"] == "pose-pairs.v1"
     assert payload["rig"]["id"] == "mh-default"
     ids = [item["id"] for item in payload["pairs"]]
-    assert "tpose-to-rest" not in ids
+    assert "tpose-to-rest" in ids
     assert "rest-to-tpose" in ids
     assert "rest-to-left-arm-up" in ids
     assert "rest-to-torso-lean" in ids
     assert "rest-to-left-knee-bend" in ids
     assert "rest-to-kick" in ids
-    # Still resolvable for include_rig defaults / existing sessions.
     pair = get_pose_pair("tpose-to-rest")
     assert pair["a"]["pose"]["id"] == "tpose"
     assert pair["b"]["pose"]["id"] == "rest"

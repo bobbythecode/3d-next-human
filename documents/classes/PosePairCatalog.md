@@ -15,11 +15,12 @@
 
 ## Golden pairs (Wave 1)
 
-Wave 1 มี **5** คู่ใน catalog (dialog) — คู่แรกที่ endpoint B เป็น **full BVH** จาก Blender: `rest-to-kick`.  
-`tpose-to-rest` ซ่อนจาก GET catalog ชั่วคราว (ยัง resolve ได้ผ่าน `get_pose_pair` / `pose_pair_id`).
+Wave 1 มี **6** คู่ใน catalog — portal กรองตามท่าหุ่นปัจจุบัน (endpoint A):  
+A-pose/`rest` → คู่ `rest→…` · T-pose → คู่ `tpose→…` (เช่น `tpose-to-rest`).
 
 | id | A → B |
 |----|-------|
+| `tpose-to-rest` | tpose → rest |
 | `rest-to-tpose` | rest → tpose |
 | `rest-to-left-arm-up` | rest → rest + UpperArmForwardLeft + UpperArmRollOutLeft |
 | `rest-to-torso-lean` | rest → rest + TorsoLeft (v2 · spine1–4→spine01–04 alias) |
