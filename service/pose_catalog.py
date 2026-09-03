@@ -208,7 +208,12 @@ def _pose_data_for_units(person, unit_weights: dict[str, float]):
     return unit_data, {"body": body_used, "face": face_used}
 
 
-def apply_pose(person, pose_id: str, pose_units: dict[str, float]) -> dict[str, Any]:
+def _apply_library_pose(
+    person,
+    pose_id: str,
+    pose_units: dict[str, float],
+) -> dict[str, Any]:
+    """Apply library BVH + poseunit overlay (no bone replace)."""
     import animation
     import transformations as tm
 
@@ -225,6 +230,12 @@ def apply_pose(person, pose_id: str, pose_units: dict[str, float]) -> dict[str, 
 
     if person.getActiveAnimation() is None:
         base = animation.emptyPose(len(person.getBaseSkeleton().getBones()))
+        rest_pose = animation.Pose("pose-library-rest", base)
+        person.addAnimation(rest_pose)
+        person.setActiveAnimation(rest_pose.name)
+        person.setToFrame(0, update=False)
+        person.setPosed(True)
+        person.refreshPose(updateIfInRest=False)
     else:
         base = person.getPoseState(noBake=True)
     unit_data, used = _pose_data_for_units(person, pose_units)
@@ -247,3 +258,54 @@ def apply_pose(person, pose_id: str, pose_units: dict[str, float]) -> dict[str, 
         person.refreshPose(updateIfInRest=False)
 
     return {"id": pose_id, "units": used}
+
+
+def apply_pose(
+    person,
+    pose_id: str,
+    pose_units: dict[str, float],
+    *,
+    replace_bones_from: str | None = None,
+    replace_bones: tuple[str, ...] | list[str] | None = None,
+) -> dict[str, Any]:
+    """Apply library pose (+ units), optionally overwrite named bones from another pose.
+
+    ``replace_bones_from`` + ``replace_bones`` copy local pose matrices for those
+    bones from the source library pose onto the primary pose — e.g. T-pose body
+    with left-arm chain from rest (A-pose side, one arm only).
+    """
+    import animation
+
+    primary = _apply_library_pose(person, pose_id, pose_units)
+    bones = tuple(str(name) for name in (replace_bones or ()) if str(name))
+    if not replace_bones_from or not bones:
+        return primary
+
+    if replace_bones_from not in allowed_pose_ids():
+        raise KeyError(f"replace_bones_from unknown: {replace_bones_from}")
+
+    base = person.getPoseState(noBake=True).copy()
+    _apply_library_pose(person, replace_bones_from, {})
+    source = person.getPoseState(noBake=True)
+    bone_index = {bone.name: bone.index for bone in person.getBaseSkeleton().getBones()}
+    merged = base.copy()
+    replaced: list[str] = []
+    for name in bones:
+        idx = bone_index.get(name)
+        if idx is None:
+            continue
+        merged[idx] = source[idx].copy()
+        replaced.append(name)
+
+    pose = animation.Pose("pose-replace-bones", merged)
+    person.addAnimation(pose)
+    person.setActiveAnimation(pose.name)
+    person.setToFrame(0, update=False)
+    person.setPosed(True)
+    person.refreshPose(updateIfInRest=False)
+
+    return {
+        **primary,
+        "replace_bones_from": replace_bones_from,
+        "replace_bones": replaced,
+    }

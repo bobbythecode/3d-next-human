@@ -165,7 +165,12 @@ def export_rig(
     be left at pose B.
     """
     pair = get_pose_pair(pose_pair_id)
-    (pose_a, units_a), (pose_b, units_b) = pose_pair_endpoints(pair)
+    (pose_a, units_a, replace_a_from, replace_a_bones), (
+        pose_b,
+        units_b,
+        replace_b_from,
+        replace_b_bones,
+    ) = pose_pair_endpoints(pair)
     overlay = dict(pose_units or {})
 
     shell = bind_shell if bind_shell is not None else build_bind_shell(person)
@@ -173,7 +178,13 @@ def export_rig(
     ground_offset_dm = float(shell["ground_offset_dm"])
     mesh = person.meshData
 
-    apply_pose(person, pose_a, {**overlay, **units_a})
+    apply_pose(
+        person,
+        pose_a,
+        {**overlay, **units_a},
+        replace_bones_from=replace_a_from,
+        replace_bones=replace_a_bones,
+    )
     skel = person.getBaseSkeleton()
     world_a = _capture_joint_world_m(skel, ground_offset_dm)
     local_a = _capture_joint_local_m(skel, ground_offset_dm)
@@ -181,7 +192,13 @@ def export_rig(
     posed_a_dm[:, 1] -= ground_offset_dm
     posed_a_m, _ = compact_used(posed_a_dm * DM_TO_M, triangles)
 
-    apply_pose(person, pose_b, {**overlay, **units_b})
+    apply_pose(
+        person,
+        pose_b,
+        {**overlay, **units_b},
+        replace_bones_from=replace_b_from,
+        replace_bones=replace_b_bones,
+    )
     skel = person.getBaseSkeleton()
     world_b = _capture_joint_world_m(skel, ground_offset_dm)
     local_b = _capture_joint_local_m(skel, ground_offset_dm)
@@ -190,7 +207,11 @@ def export_rig(
     posed_b_m, _ = compact_used(posed_b_dm * DM_TO_M, triangles)
 
     pose_a_label = pose_a if not units_a else f"{pose_a}+units"
+    if replace_a_from:
+        pose_a_label = f"{pose_a_label}+{replace_a_from}-bones"
     pose_b_label = pose_b if not units_b else f"{pose_b}+units"
+    if replace_b_from:
+        pose_b_label = f"{pose_b_label}+{replace_b_from}-bones"
     coords_m = np.asarray(shell["coords_m"], dtype=np.float64)
 
     return {
