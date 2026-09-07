@@ -18,5 +18,3 @@ Summary: `documents/guides/license.md` · Full text: `LICENSE.md` sections A–E
 ❌ Do not pip-install or COPY this source into another app
 ❌ Do not tie the gate to a desktop window
 ```
-
-Plan: `documents/plans/human-api.md`

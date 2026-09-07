@@ -25,10 +25,10 @@ AGPL attaches when this source is copied or imported. It does **not** attach mer
 ❌ Combine human-api with another app in one process and call that isolation
 ```
 
-Engineering detail: [`../plans/human-api.md`](../plans/human-api.md) · rule: `.cursor/rules/agpl-isolation.mdc`
+Rule: `.cursor/rules/agpl-isolation.mdc`
 
 ## Endpoint
 
 `GET /license` → JSON pointing at AGPL · source URL · assets = CC0 · output = user-data · LICENSE files
 
-Example payload: see `service/http_api.py` · class [`../classes/HumanHttpApi.md`](../classes/HumanHttpApi.md)
+Example payload: see `service/http_api.py`
