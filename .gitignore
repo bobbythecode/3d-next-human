@@ -87,3 +87,8 @@ Thumbs.db
 # Python Packages #
 ###################
 .eggs/*
+
+# Cursor IDE #
+#############
+.cursor/
+
