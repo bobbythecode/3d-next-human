@@ -16,6 +16,7 @@ from .modifier_request import ModifierRequestError
 SERVICE = "human-api"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8001
+DEFAULT_MAX_BODY_BYTES = 1_048_576
 
 logger = logging.getLogger(SERVICE)
 
@@ -138,14 +139,35 @@ class HumanHttpApi(BaseHTTPRequestHandler):
 
         self._dispatch(handler)
 
+    def _read_body(self) -> bytes | None:
+        """Read the whole request body, or answer the error and return None.
+
+        The body is always consumed (or the connection closed): leftover bytes on a
+        keep-alive connection would be parsed as the next request.
+        """
+        max_bytes = int(os.environ.get("HUMAN_API_MAX_BODY_BYTES", DEFAULT_MAX_BODY_BYTES))
+        header = (self.headers.get("content-length") or "0").strip()
+        if not header.isdigit():
+            self.close_connection = True
+            self._send_json(400, {"ok": False, "error": "invalid content-length"})
+            return None
+        length = int(header)
+        if length > max_bytes:
+            self.close_connection = True
+            self._send_json(413, {"ok": False, "error": "body too large"})
+            return None
+        return self.rfile.read(length) if length else b""
+
     def do_POST(self) -> None:  # noqa: N802
         def handler() -> None:
             path = urlparse(self.path).path
+            body = self._read_body()
+            if body is None:
+                return
             if path != "/internal/humans/generate":
                 self._send_json(404, {"ok": False, "error": "not found"})
                 return
-            length = int(self.headers.get("content-length") or "0")
-            raw = self.rfile.read(length) if length else b"{}"
+            raw = body or b"{}"
             try:
                 payload = json.loads(raw.decode("utf-8") or "{}")
             except json.JSONDecodeError:

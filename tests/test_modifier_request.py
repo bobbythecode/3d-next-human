@@ -139,3 +139,18 @@ def test_pose_pair_requires_include_rig():
 def test_rejects_unknown_pose_pair():
     with pytest.raises(ModifierRequestError, match="unknown pose_pair_id"):
         HumanModifierRequest.parse({"include_rig": True, "pose_pair_id": "nope"})
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_numbers_are_rejected(bad):
+    with pytest.raises(ModifierRequestError, match="finite"):
+        HumanModifierRequest.parse({"gender": bad})
+    with pytest.raises(ModifierRequestError):
+        HumanModifierRequest.parse({"height_cm": bad})
+
+
+def test_nan_from_real_json_text_is_rejected():
+    import json
+
+    with pytest.raises(ModifierRequestError):
+        HumanModifierRequest.parse(json.loads('{"weight": NaN}'))

@@ -98,3 +98,25 @@ def test_generate_applies_body_cm_bust_differently():
     assert narrow["obj"] != wide["obj"]
     assert qt_imported() is False
 
+
+@pytest.mark.integration
+def test_failed_generate_does_not_poison_the_next_request():
+    """A request that dies mid-apply must not leave a stale shape signature behind."""
+    from unittest import mock
+
+    from service import session
+    from service.pose_catalog import pose_units_map
+
+    unit = next(k for k, group in pose_units_map().items() if group == "body")
+    shape_a = {"height_cm": 170, "gender": 0.2, "pose_units": {unit: 0.5}}
+    reference = session.generate(shape_a)["obj"]
+    session._GENERATE_CACHE.clear()  # force a recompute for A, shape signature stays A
+
+    shape_b = {"height_cm": 190, "gender": 1.0, "body": {"waist": 60}}
+    with mock.patch.object(session, "apply_body_cm", side_effect=RuntimeError("boom")):
+        with pytest.raises(RuntimeError):
+            session.generate(shape_b)
+
+    same = session.generate(shape_a)["obj"] == reference
+    # assert on the bool: pytest would otherwise difflib two huge OBJ strings
+    assert same, "request after a failed generate was served from a half-applied body"

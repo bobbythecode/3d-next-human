@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any, Mapping, Optional
 
@@ -37,7 +38,11 @@ class ModifierRequestError(ValueError):
 def _as_number(value: Any, name: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ModifierRequestError(f"{name} must be a number")
-    return float(value)
+    number = float(value)
+    # json.loads accepts NaN/Infinity, and NaN slips through every range check.
+    if not math.isfinite(number):
+        raise ModifierRequestError(f"{name} must be a finite number")
+    return number
 
 
 def _as_unit(value: Any, name: str) -> float:

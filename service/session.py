@@ -119,6 +119,10 @@ def _generate_locked(payload: object) -> dict[str, Any]:
         return cached
 
     if _SHAPE_SIG != sig:
+        # Invalidate first: if applying fails midway the person is left half-applied,
+        # and a stale signature would make the next request skip the re-apply.
+        _SHAPE_SIG = None
+        _BIND_SHELL = None
         person.resetMeshValues()
         for full_name, value in request.modifier_values().items():
             person.getModifier(full_name).setValue(value)
@@ -129,7 +133,6 @@ def _generate_locked(payload: object) -> dict[str, Any]:
         if request.body_cm:
             apply_body_cm(person, request.body_cm)
         _SHAPE_SIG = sig
-        _BIND_SHELL = None
         # Drop generate cache entries for other shapes to bound memory.
         stale = [k for k in _GENERATE_CACHE if k[0] != sig]
         for k in stale:
